@@ -10,7 +10,7 @@ import com.banyan.FullLoadRequest.Entities.RateQtAddress;
 
 public interface RateQtAddressRepository extends CrudRepository<RateQtAddress, Integer>, RateQtAddressRepositoryCustom {
 
-	@Query(nativeQuery = true, value = "select * from Rate_Quote_Address where rt_qte_id=:qt_id")
+	@Query(nativeQuery = true, value = "select * from Rate_Quote_Address_VW where rt_qte_id=:qt_id")
 	List<RateQtAddress> FindAllByRtQteId(@Param("qt_id") Integer rtQteId);
 
 	@Query(nativeQuery = true, value = "select name from client where code=:code")

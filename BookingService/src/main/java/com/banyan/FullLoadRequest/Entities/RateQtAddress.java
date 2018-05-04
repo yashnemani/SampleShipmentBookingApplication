@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "RATE_QUOTE_ADDRESS", schema = "TBB")
+@Table(name = "RATE_QUOTE_ADDRESS_VW", schema = "TBB")
 public class RateQtAddress implements Serializable {
 	private static final long serialVersionUID = 1L;
 

@@ -1,7 +1,5 @@
 package com.banyan.FullLoadRequest.Repos;
 
-import java.util.List;
-
 import com.banyan.FullLoadRequest.models.Booking.Address;
 import com.banyan.FullLoadRequest.models.Booking.Contact;
 

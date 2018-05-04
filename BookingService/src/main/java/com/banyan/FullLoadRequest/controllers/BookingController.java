@@ -64,7 +64,7 @@ public class BookingController {
 	// Generate ImportForBook_Request Object from the given RateQuoteId
 	@GetMapping("/getImportBookRequest/{id}")
 	public ImportForBook_Request getImportForBook(@PathVariable Integer id) {
-		boolean autoDispatch = true;
+		boolean autoDispatch = false;
 		importBook = importService.buildImport(id, autoDispatch);
 		return importBook;
 	}
