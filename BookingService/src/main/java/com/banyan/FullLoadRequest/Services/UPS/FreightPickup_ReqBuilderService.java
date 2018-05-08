@@ -1,5 +1,6 @@
 package com.banyan.FullLoadRequest.Services.UPS;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,16 +80,20 @@ public class FreightPickup_ReqBuilderService {
 
 		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(bookingId);
 		RateQtAddress address = addresses.get(0);
+		Timestamp pkupDate = address.getDtProjectedPickup();
+		String PkUpDate = pkupDate.toString();
+		Timestamp today = new Timestamp(System.currentTimeMillis());
 
-		String PkUpDate = address.getDtProjectedPickup().toString();
-		if (PkUpDate == null)
-			PkUpDate = "20180501";
-		else {
-			/*
-			 * PkUpDate = PkUpDate.substring(0, 10); PkUpDate = PkUpDate.replace("-", "");
-			 */
-			PkUpDate = "20180501";
-		}
+		if (PkUpDate != null) {
+			System.out.println("PkUpDate Timestamp " + PkUpDate);
+			if (!pkupDate.after(today))
+				PkUpDate = today.toString();
+		} else
+			PkUpDate = today.toString();
+
+		PkUpDate = PkUpDate.substring(0, 10);
+		PkUpDate = PkUpDate.replace("-", "");
+		System.out.println("PkUpDate Date " + PkUpDate);
 
 		String earliestPkUpTime = address.getTimeFreightReady();
 		if (earliestPkUpTime == null)

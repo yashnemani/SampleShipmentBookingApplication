@@ -98,13 +98,14 @@ public class BookingBuilderService {
 			dtEntered = qtRep.findById(id).get().getDtEntered();
 			statusDates.setDt_entered(dtEntered);
 		}
-		book.setStatusDates(statusDates);
 
+		book.setStatusDates(statusDates);
 		try {
 			bookRepo.save(book);
 			bookRepo.refresh(book);
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());
+			System.err.println(ex);
 		}
 
 		return book;

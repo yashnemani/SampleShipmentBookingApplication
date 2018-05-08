@@ -67,6 +67,7 @@ public class JPAconfiguration {
 
 		// Configures the used database dialect. This allows Hibernate to create SQL
 		// that is optimized for the used database.
+		System.out.println(env.getRequiredProperty("hibernate.dialect"));
 		jpaProperties.put("hibernate.dialect", env.getRequiredProperty("hibernate.dialect"));
 
 		// Specifies the action that is invoked to the database when the Hibernate

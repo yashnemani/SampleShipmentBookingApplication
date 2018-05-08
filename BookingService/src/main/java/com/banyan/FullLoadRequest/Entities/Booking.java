@@ -46,7 +46,7 @@ public class Booking implements Persistable<Integer> {
 	@Column(name = "PROVIDER_ID")
 	private Integer PROVIDER_ID;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "booking", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
 	private Set<BookingReferences> references;
 
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
