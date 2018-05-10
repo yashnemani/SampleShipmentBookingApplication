@@ -51,7 +51,9 @@ public class RateServicesBuildService {
 
 		//
 		int noSkids = detail.getNoSkids();
-		int noPieces = detail.getNoPieces();
+		int noPieces = 0;
+		if(detail.getNoPieces()!=null)
+		 noPieces = detail.getNoPieces();
 		if (noSkids != 0)
 			shippingQty = noSkids;
 		else

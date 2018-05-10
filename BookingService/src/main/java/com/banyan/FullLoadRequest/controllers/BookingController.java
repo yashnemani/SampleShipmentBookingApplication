@@ -22,6 +22,7 @@ import com.banyan.FullLoadRequest.Services.Banyan.ImportBuildService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
 import com.banyan.FullLoadRequest.Services.Booking.FullLoadBuildService;
+import com.banyan.FullLoadRequest.Services.Booking.GenerateBookingsFromQueue;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.ImportForBook_Request;
 
@@ -46,6 +47,8 @@ public class BookingController {
 	BookingBuilderService bookService;
 	@Autowired
 	ImportResponseHandlerService importResponseHandler;
+	@Autowired
+	GenerateBookingsFromQueue bookingQueueService;
 
 	// Generate FullLoadRequest Object from the given RateQuoteId
 	@GetMapping("/getFullLoadRequest/{id}")
@@ -64,7 +67,7 @@ public class BookingController {
 	// Generate ImportForBook_Request Object from the given RateQuoteId
 	@GetMapping("/getImportBookRequest/{id}")
 	public ImportForBook_Request getImportForBook(@PathVariable Integer id) {
-		boolean autoDispatch = false;
+		boolean autoDispatch = true;
 		importBook = importService.buildImport(id, autoDispatch);
 		return importBook;
 	}

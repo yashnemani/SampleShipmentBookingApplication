@@ -46,7 +46,9 @@ public class ProductBuildService {
 		}
 
 		FreightClasses freightClass;
-		Integer c = detail.getClassNo().intValue();
+		Integer c = 50;
+		if(detail.getClassNo()!=null)
+		c = detail.getClassNo().intValue();
 		String f = "c" + c;
 		freightClass = FreightClasses.valueOf(f);
 		System.out.println(freightClass.getValue());

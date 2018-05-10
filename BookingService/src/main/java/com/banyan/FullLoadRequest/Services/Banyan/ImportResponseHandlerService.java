@@ -1,5 +1,6 @@
 package com.banyan.FullLoadRequest.Services.Banyan;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
 import com.banyan.FullLoadRequest.Entities.BookingReferences;
+import com.banyan.FullLoadRequest.Entities.NxtStatusDates;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.Services.Booking.BookRefSaveService;
 import com.google.gson.Gson;
@@ -61,6 +63,7 @@ public class ImportResponseHandlerService {
 		Set<BookingReferences> bookRefs = new HashSet<>();
 		Optional<Booking> book1 = bookRepo.findById(id);
 		book = book1.get();
+		book.setUpdate(true);
 
 		if (LoadID != null) {
 			BookingReferences bookRef1 = new BookingReferences();
@@ -82,6 +85,18 @@ public class ImportResponseHandlerService {
 
 		bookRefs.forEach(a -> System.out.println(" Import References: " + a.getRef_type() + ","));
 		book.setReferences(bookRefs);
+
+		// Status Dates - Booking Date with Banyan
+		NxtStatusDates statusDates = new NxtStatusDates();
+		if (book.getStatusDates() != null)
+			statusDates = book.getStatusDates();
+		Timestamp dtBooked = new Timestamp(System.currentTimeMillis());
+		if (statusDates.getBooking() == null) {
+			statusDates.setBooking(book);
+		}
+		statusDates.setDt_entered(dtBooked);
+		book.setStatusDates(statusDates);
+
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {

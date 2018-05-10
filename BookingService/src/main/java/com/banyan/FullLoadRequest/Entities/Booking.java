@@ -46,11 +46,17 @@ public class Booking implements Persistable<Integer> {
 	@Column(name = "PROVIDER_ID")
 	private Integer PROVIDER_ID;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "booking", cascade = CascadeType.ALL)
 	private Set<BookingReferences> references;
 
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
 	private NxtStatusDates statusDates;
+
+	@OneToOne(fetch = FetchType.EAGER, mappedBy = "booking", cascade = CascadeType.ALL)
+	private BookingCurrentStatus currentStatus;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
+	private Set<BookingStatus> statuses;
 
 	@Transient
 	private boolean update;
@@ -90,20 +96,15 @@ public class Booking implements Persistable<Integer> {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutput out = null;
-		/* java.sql.Blob blob; */
 		try {
 			out = new ObjectOutputStream(bos);
 			out.writeObject(fullLoad);
-
 			byte[] yourBytes = bos.toByteArray();
-			/* blob = new SerialBlob(yourBytes); */
 			this.fullLoad = yourBytes;
 		} finally {
-
 			out.close();
 			bos.close();
 		}
-
 	}
 
 	public Integer getPROVIDER_ID() {
@@ -142,6 +143,22 @@ public class Booking implements Persistable<Integer> {
 
 	public void setStatusDates(NxtStatusDates statusDates) {
 		this.statusDates = statusDates;
+	}
+
+	public BookingCurrentStatus getCurrentStatus() {
+		return currentStatus;
+	}
+
+	public void setCurrentStatus(BookingCurrentStatus currentStatus) {
+		this.currentStatus = currentStatus;
+	}
+
+	public Set<BookingStatus> getStatuses() {
+		return statuses;
+	}
+
+	public void setStatuses(Set<BookingStatus> statuses) {
+		this.statuses = statuses;
 	}
 
 }

@@ -102,22 +102,31 @@ public class FullLoadBuildService {
 	public FullLoad_Request buildFullLoad(int id) {
 
 		Optional<RateQt> qt;
-		
-		if(qtRep.existsById(id))
-		qt = qtRep.findById(id);
+
+		if (qtRep.existsById(id))
+			qt = qtRep.findById(id);
 		else
 			return null;
-		
-		RateQt qte = qt.get();  
-		
+
+		RateQt qte = qt.get();
+
 		List<RateQtAddress> addresses = new ArrayList<>();
 		RateQtAddress rtQtAdd = new RateQtAddress();
 		addresses = addressRep.FindAllByRtQteId(qte.getId());
+		if (addresses.isEmpty()) {
+			System.out.println("Rate Quote Address does not exist for the given information.");
+			return null;
+		}
 		rtQtAdd = addresses.get(0);
 
 		List<RateQtDetail> details = new ArrayList<>();
 		RateQtDetail detail = new RateQtDetail();
 		details = detailRep.findByRtQteAddId(rtQtAdd.getId());
+		if (details.isEmpty()) {
+			System.out.println("Rate Quote Detail does not exist for the given information.");
+			return null;
+		}
+
 		detail = details.get(0);
 
 		shipper = shipperService.buildShipper(rtQtAdd);
@@ -140,7 +149,7 @@ public class FullLoadBuildService {
 		AuthenticationData authData = new AuthenticationData();
 		Integer clientCode = qte.getSiteClientCode();
 		Integer locNumber = qte.getSiteLocNumber();
-		String clientRefNum = clientCode.toString()+"-"+locNumber.toString();
+		String clientRefNum = clientCode.toString() + "-" + locNumber.toString();
 		authData.setClientRefNum(clientRefNum);
 		PackageInfo packageInfo = new PackageInfo(null, null);
 

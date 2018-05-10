@@ -18,13 +18,11 @@ public class PhoneBuildService {
 
 		if (con.getPhone() != null) {
 			String phNo = con.getPhone().replaceAll("-", "");
-			System.out.println(phNo);
 			String ph1 = phNo.substring(0, 3);
 			String ph2 = phNo.substring(3, 10);
 			ph1 = ph1 + "-";
 
 			phNo = ph1 + ph2;
-			System.out.println(phNo);
 			phone.setPhoneNum(phNo);
 		}
 		phone.setExt(con.getPhoneExt());

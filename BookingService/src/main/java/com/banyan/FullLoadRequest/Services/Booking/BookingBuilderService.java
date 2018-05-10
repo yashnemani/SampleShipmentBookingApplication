@@ -3,9 +3,10 @@ package com.banyan.FullLoadRequest.Services.Booking;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -13,10 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
+import com.banyan.FullLoadRequest.Entities.BookingCurrentStatus;
 import com.banyan.FullLoadRequest.Entities.BookingReferences;
-import com.banyan.FullLoadRequest.Entities.NxtStatusDates;
+import com.banyan.FullLoadRequest.Entities.BookingStatus;
+import com.banyan.FullLoadRequest.Entities.RateQtAddress;
 import com.banyan.FullLoadRequest.Repos.BookingReferencesRepository;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
+import com.banyan.FullLoadRequest.Repos.RateQtAddressRepository;
 import com.banyan.FullLoadRequest.Repos.RateQtRepository;
 import com.banyan.FullLoadRequest.config.HackedObjectInputStream;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
@@ -40,6 +44,8 @@ public class BookingBuilderService {
 	@Autowired
 	RateQtRepository qtRep;
 	@Autowired
+	RateQtAddressRepository addressRep;
+	@Autowired
 	BookRefSaveService refSaveService;
 
 	Integer rtQtId;
@@ -62,9 +68,17 @@ public class BookingBuilderService {
 			book.setBooking_id(id);
 		}
 
-		Map<String, Object> codeMap = new HashMap<String, Object>();
-		codeMap = qtRep.getSiteCodes();
-		String scac = codeMap.get("carrierCode").toString();
+		List<RateQtAddress> addresses = new ArrayList<>();
+		addresses = addressRep.FindAllByRtQteId(id);
+		RateQtAddress address = new RateQtAddress();
+		if (addresses.isEmpty())
+			return book;
+		address = addresses.get(0);
+		String scac = address.getCarrierCode();
+		if (scac == null) {
+			System.out.println("Rate Quote with ID " + id + " does not have a Carrier Code!");
+			return book;
+		}
 		book.setCARRIER_CODE(scac);
 		// Set Booking ProviderID based on SCAC code
 		if (scac.equals("UPGF"))
@@ -84,24 +98,46 @@ public class BookingBuilderService {
 		bookRefs = buildBookingRefs(book);
 		book.setReferences(bookRefs);
 
-		NxtStatusDates statusDates = new NxtStatusDates();
-		if (book.getStatusDates() != null)
-			statusDates = book.getStatusDates();
-		java.sql.Timestamp dtEntered = null;
-		if (statusDates.getBooking() != null) {
-			if (statusDates.getDt_entered() == null) {
-				dtEntered = qtRep.findById(id).get().getDtEntered();
-				statusDates.setDt_entered(dtEntered);
-			}
-		} else {
-			statusDates.setBooking(book);
-			dtEntered = qtRep.findById(id).get().getDtEntered();
-			statusDates.setDt_entered(dtEntered);
-		}
+		Set<BookingStatus> statuses = new HashSet<>();
+		BookingStatus bookingStatus = new BookingStatus();
+		bookingStatus.setStatus("XB");
+		bookingStatus.setLocation(fullLoad.getShipper().getLocationName());
+		bookingStatus.setMessage("Shipment Booked in Nexterus Sysytem");
+		bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
+		bookingStatus.setBooking(book);
+		statuses.add(bookingStatus);
 
-		book.setStatusDates(statusDates);
+		BookingCurrentStatus currentStatus = new BookingCurrentStatus();
+		if (book.getCurrentStatus() != null) {
+			System.out.println("Update Current Status");
+			currentStatus = book.getCurrentStatus();
+		}
+		currentStatus.setBooking(book);
+		currentStatus.setLocation(bookingStatus.getLocation());
+		currentStatus.setMessage(bookingStatus.getMessage());
+		currentStatus.setStatus(bookingStatus);
+		currentStatus.setShipStatus(bookingStatus.getStatus());
+		currentStatus.setShipState("AP");
+		currentStatus.setDate(bookingStatus.getDate());
+
+		book.setStatuses(statuses);
+		book.setCurrentStatus(currentStatus);
+
 		try {
 			bookRepo.save(book);
+		} catch (RuntimeException ex) {
+			System.err.println("Save Book " + ex.getCause().getMessage());
+			System.err.println(ex);
+		}
+
+		try {
+			bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
+		} catch (RuntimeException ex) {
+			System.err.println("Save Book " + ex.getCause().getMessage());
+			System.err.println(ex);
+		}
+
+		try {
 			bookRepo.refresh(book);
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());

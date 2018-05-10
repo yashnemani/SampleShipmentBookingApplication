@@ -19,12 +19,14 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaDialect;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.banyan.FullLoadRequest.models.enums.Databases;
 
 @Configuration
 @EnableTransactionManagement
+@EnableScheduling
 public class JPAconfiguration {
 
 	@Autowired
@@ -52,7 +54,7 @@ public class JPAconfiguration {
 		targetDataSources.put(Databases.Prod, prodDataSource);
 		RoutingDataSourceExtractor routingDataSource = new RoutingDataSourceExtractor();
 		routingDataSource.setTargetDataSources(targetDataSources);
-		routingDataSource.setDefaultTargetDataSource(devDataSource);
+		routingDataSource.setDefaultTargetDataSource(prodDataSource);
 		return routingDataSource;
 	}
 
