@@ -1,6 +1,7 @@
 package com.banyan.FullLoadRequest.Services.UPS;
 
 import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ public class FreightPickup_ReqBuilderService {
 	@Autowired
 	BookingBuilderService bookService;
 
+	@SuppressWarnings("unused")
 	public FreightPickupRequest buildfreightPickup(int bookingId) {
 
 		book = bookService.getBooking(bookingId);
@@ -82,14 +84,25 @@ public class FreightPickup_ReqBuilderService {
 		RateQtAddress address = addresses.get(0);
 		Timestamp pkupDate = address.getDtProjectedPickup();
 		String PkUpDate = pkupDate.toString();
-		Timestamp today = new Timestamp(System.currentTimeMillis());
+		Timestamp futureDay = new Timestamp(System.currentTimeMillis());
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(futureDay);
+		// Needs Review
+		if (cal.get(Calendar.DAY_OF_WEEK) == 6)
+			cal.add(Calendar.DAY_OF_WEEK, 3);
+		else if (cal.get(Calendar.DAY_OF_WEEK) == 7)
+			cal.add(Calendar.DAY_OF_WEEK, 2);
+		else
+			cal.add(Calendar.DAY_OF_WEEK, 1);
+		futureDay.setTime(cal.getTime().getTime());
 
 		if (PkUpDate != null) {
 			System.out.println("PkUpDate Timestamp " + PkUpDate);
-			if (!pkupDate.after(today))
-				PkUpDate = today.toString();
+			if (!pkupDate.after(futureDay))
+				PkUpDate = futureDay.toString();
 		} else
-			PkUpDate = today.toString();
+			PkUpDate = futureDay.toString();
 
 		PkUpDate = PkUpDate.substring(0, 10);
 		PkUpDate = PkUpDate.replace("-", "");

@@ -64,4 +64,13 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		};
 		jdbc.update(sql, prep);
 	}
+
+	@Override
+	public void insertIntoBookingQueue() {
+
+		setJdbcTemplate(ds);
+		String sql = "insert into booking_queue(rate_id) select TBB_REFERENCE_NBR from status_summary where status_code='SS' and carrier_code not in ('RPSI','FEDE') order by TBB_REFERENCE_NBR desc  FETCH FIRST 20 ROWS ONLY";
+		int q = jdbc.update(sql);
+		System.out.println(q + " rows inserted");
+	}
 }

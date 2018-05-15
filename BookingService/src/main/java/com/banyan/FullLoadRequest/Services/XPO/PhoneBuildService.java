@@ -17,11 +17,10 @@ public class PhoneBuildService {
 	public XPO_Phone buildPhone(Contact con) {
 
 		if (con.getPhone() != null) {
-			String phNo = con.getPhone().replaceAll("-", "");
+			String phNo = con.getPhone().replaceAll("-", "").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll(" ", "");
 			String ph1 = phNo.substring(0, 3);
 			String ph2 = phNo.substring(3, 10);
 			ph1 = ph1 + "-";
-
 			phNo = ph1 + ph2;
 			phone.setPhoneNum(phNo);
 		}

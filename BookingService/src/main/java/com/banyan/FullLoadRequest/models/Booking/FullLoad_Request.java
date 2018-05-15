@@ -35,7 +35,7 @@ public class FullLoad_Request implements Serializable{
 	private List<UserDefined> UserDefined;
 	private List<ReferenceField> ReferenceField;
 
-	private FullLoad_Request() {
+	public FullLoad_Request() {
 
 	}
 

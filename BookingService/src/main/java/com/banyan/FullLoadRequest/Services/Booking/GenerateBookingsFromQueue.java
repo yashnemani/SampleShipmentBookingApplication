@@ -34,18 +34,31 @@ public class GenerateBookingsFromQueue {
 	@Autowired
 	PickupControlller pickupController;
 
-	@Scheduled(cron = "0 0/1 * * * ?")
+	@Scheduled(cron = "0 1 * * * ?")
 	public void getBookingsFromQueue() {
+
+		// Populate Booking Queue
+		bookRepo.insertIntoBookingQueue();
+
+		// Retrieve IDs from Booking Queue and generate Bookings in system
 		List<BigDecimal> rateIdList = new ArrayList<>();
 		rateIdList = bookRefRepo.findAllFromQueue();
 		System.out.println("Queue Size: " + rateIdList.size());
-		rateIdList.forEach(a -> System.out.println(a));
+		rateIdList.forEach(a -> System.out.println("BookingID " + a));
 		rateIdList.forEach(a -> handleBooking(a));
 	}
 
 	public void handleBooking(BigDecimal rateID) {
 
 		int rateId = rateID.intValue();
+
+		// If Booking with ID already exists in DB, skip and delete from queue
+		if (bookRepo.existsById(rateId)) {
+			System.out.println("Booking with ID " + rateId + " already exists!");
+			bookRepo.deleteFromBookingQueue(rateId);
+			return;
+		}
+
 		// Get FullLoad Object
 		fullLoad = fullLoadService.buildFullLoad(rateId);
 		if (fullLoad == null) {
@@ -60,27 +73,26 @@ public class GenerateBookingsFromQueue {
 			System.out.println("Booking could not be created for the given ID " + rateId);
 			return;
 		}
-		
-		//Delete Booking from booking Queue
+
+		// Delete Booking from booking Queue
 		bookRepo.deleteFromBookingQueue(rateId);
-		
+
 		// Call Banyan to Book Shipment
-		if(book.getPROVIDER_ID()==0) {
+		if (book.getPROVIDER_ID() == 0) {
 			try {
 				bookController.callBanyan(rateId);
 			} catch (JSONException e) {
 				System.err.println(e.getCause().getMessage());
 			}
 		}
-		//Call XPO to schedule Pickup
-		else if(book.getPROVIDER_ID()==1) {
+		// Call XPO to schedule Pickup
+		else if (book.getPROVIDER_ID() == 1) {
 			pickupController.createXpoPickup(rateId);
 		}
-		//Call UPS to schedule Pickup
-		else if(book.getPROVIDER_ID()==2) {
+		// Call UPS to schedule Pickup
+		else if (book.getPROVIDER_ID() == 2) {
 			pickupController.postUPSPickup(rateId);
 		}
-			
-		
+
 	}
 }

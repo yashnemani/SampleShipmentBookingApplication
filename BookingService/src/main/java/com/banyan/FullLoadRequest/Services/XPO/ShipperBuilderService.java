@@ -21,16 +21,20 @@ public class ShipperBuilderService {
 
 		xPO_Phone = phoneService.buildPhone(shipper.getContactInfo());
 		String cntryCd = shipper.getAddressInfo().getCountryCode();
-		if(cntryCd==null)
-			cntryCd="US";
-		else if(cntryCd.equals("CA"))
-			cntryCd="CN";
+		String address1 = shipper.getAddressInfo().getAddress1();
+		String address2 = shipper.getAddressInfo().getAddress2();
+		if (address1 != null)
+			address1 = address1.replace("\n", " ").replace("\r", " ");
+		if (address2 != null)
+			address2 = address2.replace("\n", " ").replace("\r", " ");
+		if (cntryCd == null)
+			cntryCd = "US";
+		else if (cntryCd.equals("CA"))
+			cntryCd = "CN";
 		xpoShipper = new XPO_Shipper.Builder().setName(shipper.getContactInfo().getContactName())
-				.setAddressLine1(shipper.getAddressInfo().getAddress1())
-				.setAddressLine2(shipper.getAddressInfo().getAddress2()).setCityName(shipper.getAddressInfo().getCity())
-				.setCountryCd(cntryCd)
-				.setPostalCd(shipper.getAddressInfo().getZipcode()).setStateCd(shipper.getAddressInfo().getState())
-				.setPhone(xPO_Phone).build();
+				.setAddressLine1(address1).setAddressLine2(address2).setCityName(shipper.getAddressInfo().getCity())
+				.setCountryCd(cntryCd).setPostalCd(shipper.getAddressInfo().getZipcode())
+				.setStateCd(shipper.getAddressInfo().getState()).setPhone(xPO_Phone).build();
 
 		return xpoShipper;
 	}

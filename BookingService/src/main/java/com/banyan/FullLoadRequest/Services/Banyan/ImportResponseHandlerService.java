@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
+import com.banyan.FullLoadRequest.Entities.BookingCurrentStatus;
 import com.banyan.FullLoadRequest.Entities.BookingReferences;
+import com.banyan.FullLoadRequest.Entities.BookingStatus;
 import com.banyan.FullLoadRequest.Entities.NxtStatusDates;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.Services.Booking.BookRefSaveService;
@@ -96,6 +98,34 @@ public class ImportResponseHandlerService {
 		}
 		statusDates.setDt_entered(dtBooked);
 		book.setStatusDates(statusDates);
+
+		if (pickupNum != null) {
+			// Set Booking Status and Current Status
+			Set<BookingStatus> statuses = new HashSet<>();
+			BookingStatus bookingStatus = new BookingStatus();
+			bookingStatus.setStatus("AA");
+			bookingStatus.setLocation(null);
+			bookingStatus.setMessage("Pickup Appointment Arranged ");
+			bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
+			bookingStatus.setBooking(book);
+			statuses.add(bookingStatus);
+
+			BookingCurrentStatus currentStatus = new BookingCurrentStatus();
+			if (book.getCurrentStatus() != null) {
+				System.out.println("Update Current Status");
+				currentStatus = book.getCurrentStatus();
+			}
+			currentStatus.setBooking(book);
+			currentStatus.setLocation(bookingStatus.getLocation());
+			currentStatus.setMessage(bookingStatus.getMessage());
+			currentStatus.setStatus(bookingStatus);
+			currentStatus.setShipStatus(bookingStatus.getStatus());
+			currentStatus.setShipState("AP");
+			currentStatus.setDate(bookingStatus.getDate());
+
+			book.setStatuses(statuses);
+			book.setCurrentStatus(currentStatus);
+		}
 
 		try {
 			bookRepo.save(book);

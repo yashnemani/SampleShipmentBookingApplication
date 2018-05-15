@@ -26,8 +26,10 @@ public class ContactBuilderService {
 
 		email = emailService.buildEmail(shipper.getContactInfo().getEmail());
 		phone = phoneService.buildPhone(shipper.getContactInfo());
-
-		contact = new XPO_Contact.Builder().setCompanyName(shipper.getCompanyName())
+		String companyName = shipper.getCompanyName();
+		if (companyName.length() > 30)
+			companyName = companyName.substring(0, 30);
+		contact = new XPO_Contact.Builder().setCompanyName(companyName)
 				.setFullName(shipper.getContactInfo().getContactName()).setEmail(email).setPhone(phone).build();
 
 		return contact;

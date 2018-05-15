@@ -16,17 +16,21 @@ public class PkupItemBuildService {
 	TotWeight weight;
 	@Autowired
 	WeightBuilderService weightService;
-	
+
 	public PkupItem buildPkupItem(FullLoad_Request fullLoad) {
-		
+
+		String remarks = fullLoad.getProducts().get(0).getDescription();
+		if (remarks.length() > 100)
+			remarks = remarks.substring(0, 99);
+		int qty = fullLoad.getProducts().get(0).getQuantity();
+		if(qty == 0)
+			qty = 1;
 		weight = weightService.buildWeight(fullLoad.getProducts().get(0));
 		pkupItem = new PkupItem.Builder().setDestZip(fullLoad.getConsignee().getAddressInfo().getZipcode())
 				.setLoosePcsCount(fullLoad.getProducts().get(0).getQuantity())
-				.setPalletCnt(fullLoad.getProducts().get(0).getQuantity())
-				.setRemarks(fullLoad.getProducts().get(0).getDescription())
-				.setHazmatInd(fullLoad.getProducts().get(0).isIsHazmat())
-				.setTotweight(weight).build();
-		
+				.setPalletCnt(qty).setRemarks(remarks)
+				.setHazmatInd(fullLoad.getProducts().get(0).isIsHazmat()).setTotweight(weight).build();
+
 		return pkupItem;
 	}
 }

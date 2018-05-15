@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
 import com.banyan.FullLoadRequest.Entities.BookingCurrentStatus;
@@ -50,9 +51,9 @@ public class BookingBuilderService {
 
 	Integer rtQtId;
 
-	// Generate Booking Entity and Booking_References from FullLoad_Request Object
-	// and persist in DB Schema
+	// Generate and save Booking from FullLoad_Request Object
 	public Booking buildBooking(FullLoad_Request fullLoad1, int id) {
+
 		Booking book = new Booking();
 		fullLoad = fullLoad1;
 		boolean bool = bookRepo.existsById(id);
@@ -68,18 +69,21 @@ public class BookingBuilderService {
 			book.setBooking_id(id);
 		}
 
-		List<RateQtAddress> addresses = new ArrayList<>();
-		addresses = addressRep.FindAllByRtQteId(id);
-		RateQtAddress address = new RateQtAddress();
-		if (addresses.isEmpty())
-			return book;
-		address = addresses.get(0);
-		String scac = address.getCarrierCode();
+		// Save FullLoad Object as BLOB
+		try {
+			book.setFullLoad(fullLoad1);
+		} catch (SQLException | IOException e) {
+			e.printStackTrace();
+		}
+
+		// Save Booking Carrier Code
+		String scac = getCarrierCode(id);
 		if (scac == null) {
 			System.out.println("Rate Quote with ID " + id + " does not have a Carrier Code!");
 			return book;
 		}
 		book.setCARRIER_CODE(scac);
+
 		// Set Booking ProviderID based on SCAC code
 		if (scac.equals("UPGF"))
 			book.setPROVIDER_ID(2);
@@ -88,70 +92,59 @@ public class BookingBuilderService {
 		else
 			book.setPROVIDER_ID(0);
 
-		try {
-			book.setFullLoad(fullLoad);
-		} catch (SQLException | IOException e) {
-			e.printStackTrace();
-		}
-
+		// Generate and Save Booking Reference Numbers
 		Set<BookingReferences> bookRefs = new HashSet<>();
-		bookRefs = buildBookingRefs(book);
+		bookRefs = buildBookingRefs(book, fullLoad1);
 		book.setReferences(bookRefs);
 
-		Set<BookingStatus> statuses = new HashSet<>();
-		BookingStatus bookingStatus = new BookingStatus();
-		bookingStatus.setStatus("XB");
-		bookingStatus.setLocation(fullLoad.getShipper().getLocationName());
-		bookingStatus.setMessage("Shipment Booked in Nexterus Sysytem");
-		bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
-		bookingStatus.setBooking(book);
-		statuses.add(bookingStatus);
+		if (book.getCurrentStatus() == null) {
+			// Set Booking Status and Current Status
+			Set<BookingStatus> statuses = new HashSet<>();
+			BookingStatus bookingStatus = new BookingStatus();
+			bookingStatus.setStatus("XB");
+			bookingStatus.setLocation(fullLoad1.getShipper().getLocationName());
+			bookingStatus.setMessage("Shipment Booked in Nexterus Sysytem");
+			bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
+			bookingStatus.setBooking(book);
+			statuses.add(bookingStatus);
 
-		BookingCurrentStatus currentStatus = new BookingCurrentStatus();
-		if (book.getCurrentStatus() != null) {
-			System.out.println("Update Current Status");
-			currentStatus = book.getCurrentStatus();
+			BookingCurrentStatus currentStatus = new BookingCurrentStatus();
+			currentStatus.setBooking(book);
+			currentStatus.setLocation(bookingStatus.getLocation());
+			currentStatus.setMessage(bookingStatus.getMessage());
+			currentStatus.setStatus(bookingStatus);
+			currentStatus.setShipStatus(bookingStatus.getStatus());
+			currentStatus.setShipState("AP");
+			currentStatus.setDate(bookingStatus.getDate());
+
+			book.setStatuses(statuses);
+			book.setCurrentStatus(currentStatus);
 		}
-		currentStatus.setBooking(book);
-		currentStatus.setLocation(bookingStatus.getLocation());
-		currentStatus.setMessage(bookingStatus.getMessage());
-		currentStatus.setStatus(bookingStatus);
-		currentStatus.setShipStatus(bookingStatus.getStatus());
-		currentStatus.setShipState("AP");
-		currentStatus.setDate(bookingStatus.getDate());
-
-		book.setStatuses(statuses);
-		book.setCurrentStatus(currentStatus);
 
 		try {
 			bookRepo.save(book);
-		} catch (RuntimeException ex) {
-			System.err.println("Save Book " + ex.getCause().getMessage());
-			System.err.println(ex);
-		}
-
-		try {
-			bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
-		} catch (RuntimeException ex) {
-			System.err.println("Save Book " + ex.getCause().getMessage());
-			System.err.println(ex);
-		}
-
-		try {
 			bookRepo.refresh(book);
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());
 			System.err.println(ex);
+			return null;
 		}
 
+		try {
+			if (book.getPROVIDER_ID() != 0)
+				bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
+		} catch (RuntimeException ex) {
+			System.err.println("Save Book " + ex.getCause().getMessage());
+			System.err.println(ex);
+		}
 		return book;
 	}
 
 	// Generate/Update List of BookingReferences from Loadinfo
-	public Set<BookingReferences> buildBookingRefs(Booking book) {
+	public Set<BookingReferences> buildBookingRefs(Booking book, FullLoad_Request fullLoad1) {
 
 		Set<BookingReferences> bookRefs = new HashSet<>();
-		load = fullLoad.getLoadinfo();
+		load = fullLoad1.getLoadinfo();
 
 		if (load.getManifestID() != null) {
 			BookingReferences bookRef1 = new BookingReferences();
@@ -215,14 +208,30 @@ public class BookingBuilderService {
 
 	// Retrieve Deserialized FullLoad Object from Booking Entity
 	public FullLoad_Request getFullLoad(Booking books) {
-		fullLoad = null;
-		try {
-			ByteArrayInputStream in = new ByteArrayInputStream(books.getFullLoad());
-			HackedObjectInputStream his = new HackedObjectInputStream(in);
-			fullLoad = (FullLoad_Request) his.readObject();
-		} catch (ClassNotFoundException | IOException e) {
-			System.err.println("Deserialize FullLoad " + e.getCause().getMessage());
-		}
-		return fullLoad;
+		FullLoad_Request fullLoad1 = new FullLoad_Request();
+		fullLoad1 = null;
+		if (books.getFullLoad() == null)
+			System.out.println("The fullload BLOB for the given booking is null");
+		else
+			try {
+				ByteArrayInputStream in = new ByteArrayInputStream(books.getFullLoad());
+				HackedObjectInputStream his = new HackedObjectInputStream(in);
+				fullLoad1 = (FullLoad_Request) his.readObject();
+			} catch (ClassNotFoundException | IOException e) {
+				System.err.println("Deserialize FullLoad " + e.getCause().getMessage());
+			}
+		return fullLoad1;
+	}
+
+	// Get Carrier Code from Rate Address
+	public String getCarrierCode(int id) {
+		List<RateQtAddress> addresses = new ArrayList<>();
+		addresses = addressRep.FindAllByRtQteId(id);
+		RateQtAddress address = new RateQtAddress();
+		if (addresses.isEmpty())
+			return null;
+		address = addresses.get(0);
+		String scac = address.getCarrierCode();
+		return scac;
 	}
 }

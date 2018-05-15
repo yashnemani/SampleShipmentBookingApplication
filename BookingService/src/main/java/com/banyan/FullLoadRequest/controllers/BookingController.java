@@ -1,6 +1,8 @@
 package com.banyan.FullLoadRequest.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
+import com.banyan.FullLoadRequest.Entities.RateQtAddress;
+import com.banyan.FullLoadRequest.Repos.RateQtAddressRepository;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportBuildService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
@@ -51,8 +55,15 @@ public class BookingController {
 	GenerateBookingsFromQueue bookingQueueService;
 
 	// Generate FullLoadRequest Object from the given RateQuoteId
-	@GetMapping("/getFullLoadRequest/{id}")
-	public FullLoad_Request getFullLoad(@PathVariable Integer id) {
+	@GetMapping("/getFullLoadRequest/{id}/{update}")
+	public FullLoad_Request getFullLoad(@PathVariable Integer id, @PathVariable boolean update) {
+
+		if (update == false) {
+			Booking book = null;
+			book = bookService.getBooking(id);
+			if (book != null)
+				return null;
+		}
 
 		fullLoad = fullLoadService.buildFullLoad(id);
 		if (fullLoad == null) {

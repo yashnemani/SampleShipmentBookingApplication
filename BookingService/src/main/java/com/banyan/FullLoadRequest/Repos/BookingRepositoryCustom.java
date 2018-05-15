@@ -7,4 +7,5 @@ public interface BookingRepositoryCustom {
 	void saveToTrackingQueue(int bookingId, int providerId);
 	void refresh(Booking book);
 	void deleteFromBookingQueue(int rateId);
+	void insertIntoBookingQueue();
 }
