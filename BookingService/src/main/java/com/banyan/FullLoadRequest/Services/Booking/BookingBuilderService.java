@@ -103,7 +103,7 @@ public class BookingBuilderService {
 			BookingStatus bookingStatus = new BookingStatus();
 			bookingStatus.setStatus("XB");
 			bookingStatus.setLocation(fullLoad1.getShipper().getLocationName());
-			bookingStatus.setMessage("Shipment Booked in Nexterus Sysytem");
+			bookingStatus.setMessage("Shipment Booked in Nexterus System");
 			bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
 			bookingStatus.setBooking(book);
 			statuses.add(bookingStatus);

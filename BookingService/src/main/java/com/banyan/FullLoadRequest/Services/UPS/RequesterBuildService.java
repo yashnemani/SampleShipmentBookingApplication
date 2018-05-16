@@ -24,10 +24,10 @@ public class RequesterBuildService {
 		phone.setExt(consignee.getContactInfo().getPhoneExt());
 		String email = consignee.getContactInfo().getEmail();
 		if (email == null)
-			email = "bhope@nexterus.com";
+			email = "ynemani@nexterus.com";
 		String name = consignee.getContactInfo().getContactName();
 		if (name == null)
-			name = "Brad Hope";
+			name = "Yash Nemani";
 		requester = new Requester.Builder().setAttnName(name).setName(consignee.getCompanyName()).setEmail(email)
 				.setPhone(phone).build();
 		return requester;
