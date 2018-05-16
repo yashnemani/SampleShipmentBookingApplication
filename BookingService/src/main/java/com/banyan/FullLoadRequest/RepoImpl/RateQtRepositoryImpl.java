@@ -138,7 +138,7 @@ public class RateQtRepositoryImpl implements RateQtRepositoryCustom {
 		SqlParameterSource in = new MapSqlParameterSource(inParamMap);
 
 		Map<String, Object> simpleJdbcCallResult = simpleJdbcCall.execute(in);
-		System.out.println(simpleJdbcCallResult.get("return"));
+		System.out.println("Show Client BOL: "+simpleJdbcCallResult.get("return"));
 		String clientBOL = (String) simpleJdbcCallResult.get("return");
 
 		return clientBOL;

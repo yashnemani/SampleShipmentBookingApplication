@@ -34,7 +34,7 @@ public class GenerateBookingsFromQueue {
 	@Autowired
 	PickupControlller pickupController;
 
-	@Scheduled(cron = "0 0/45 * * * ?")
+	@Scheduled(cron = "0 0/55 * * * ?")
 	public void getBookingsFromQueue() {
 
 		// Populate Booking Queue

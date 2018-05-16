@@ -60,7 +60,7 @@ public class BillToBuildService {
 
 		Integer clientCode = rtQtAddress.getSiteClientCode();
 		String showClientBOL = qtRep.findClientBOL(clientCode, siteLocNumber, rtQtAddress.getCarrierCode());
-		if (showClientBOL.equals("Y")) {
+		if (showClientBOL.equals("C")) {
 			address = addressRep.findSiteAddress(siteLocNumber, clientCode);
 			contact = addressRep.findSiteContact(clientCode, siteLocNumber);
 			String name = addressRep.findClientName(clientCode);
@@ -70,14 +70,14 @@ public class BillToBuildService {
 					.setUseDefaultBillTo(false).build();
 
 			return bill;
-		} else if (showClientBOL.equals("Y")) {
+		} else if (showClientBOL.equals("Y") || showClientBOL.equals("N")) {
 			// ReConsider
 			String name = "Nexterus";
 			Address add = new Address.Builder().setAddress1("802 Far Hills Dr").setAddress2(null).setCity("New Freedom")
 					.setState("PA").setCountryCode("US").setCountryName("USA").setLocationName("New Freedom")
 					.setZipcode("17349").build();
-			Contact con = new Contact.Builder().firstNameIs("Brad").lastNameIs("Hope").contactNameIs("Brad Hope")
-					.emailIs("bhope@nexterus.com").phoneIs("5134108284").phoneExtIs("110").faxIs(null).build();
+			Contact con = new Contact.Builder().firstNameIs("Yash").lastNameIs("Nemani").contactNameIs("Yash Nemani")
+					.emailIs("ynemani@nexterus.com").phoneIs("5134108284").phoneExtIs("110").faxIs(null).build();
 
 			BillTo bill = new BillTo.Builder().setName(name).setNote(null).setShipType(shipType.getValue())
 					.setPayType(payType.getValue()).setAddressInfo(add).setContactInfo(con).setUseDefaultBillTo(false)
