@@ -73,8 +73,8 @@ public class PkupRequestBuildService {
 		LocalDateTime closeTimes = null;
 
 		int year = LocalDateTime.now().getYear();
-		int month = LocalDateTime.now().getMonth().getValue() + 1;
-		int day = LocalDateTime.now().getDayOfMonth();
+		int month = LocalDateTime.now().getMonth().getValue();
+		int day = LocalDateTime.now().getDayOfMonth()+1;
 		try {
 			pickupDate = new java.sql.Timestamp((dateTimeFormatter.parse(pkupDateStr + " " + "07:00:00").getTime()));
 			readyTime = new java.sql.Timestamp(

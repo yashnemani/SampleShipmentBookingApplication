@@ -1,6 +1,7 @@
 package com.banyan.FullLoadRequest.Services.Booking;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
-import com.banyan.FullLoadRequest.Repos.BookingReferencesRepository;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.controllers.BookingController;
 import com.banyan.FullLoadRequest.controllers.PickupControlller;
@@ -22,8 +22,6 @@ public class GenerateBookingsFromQueue {
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
-	BookingReferencesRepository bookRefRepo;
-	@Autowired
 	BookingRepository bookRepo;
 	@Autowired
 	FullLoadBuildService fullLoadService;
@@ -34,17 +32,20 @@ public class GenerateBookingsFromQueue {
 	@Autowired
 	PickupControlller pickupController;
 
-	@Scheduled(cron = "0 0/55 * * * ?")
+	Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+	@Scheduled(cron = "0 55  * * * ?")
 	public void getBookingsFromQueue() {
 
+		// Get Last Timestamp from Booking Queue
+		timeStamp = bookRepo.getLastTimestamp();
 		// Populate Booking Queue
-		bookRepo.insertIntoBookingQueue();
+		bookRepo.insertIntoBookingQueue(timeStamp);
 
 		// Retrieve IDs from Booking Queue and generate Bookings in system
 		List<BigDecimal> rateIdList = new ArrayList<>();
-		rateIdList = bookRefRepo.findAllFromQueue();
+		rateIdList = bookRepo.findAllFromQueue();
 		System.out.println("Queue Size: " + rateIdList.size());
-		rateIdList.forEach(a -> System.out.println("BookingID " + a));
+		rateIdList.forEach(a -> System.out.println(a));
 		rateIdList.forEach(a -> handleBooking(a));
 	}
 

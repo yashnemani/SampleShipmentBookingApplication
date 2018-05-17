@@ -52,7 +52,6 @@ public class FreightPickup_ReqBuilderService {
 	@Autowired
 	BookingBuilderService bookService;
 
-	@SuppressWarnings("unused")
 	public FreightPickupRequest buildfreightPickup(int bookingId) {
 
 		book = bookService.getBooking(bookingId);

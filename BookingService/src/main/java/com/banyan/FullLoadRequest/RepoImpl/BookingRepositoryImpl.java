@@ -1,6 +1,7 @@
 package com.banyan.FullLoadRequest.RepoImpl;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -66,14 +67,39 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 	}
 
 	@Override
-	public void insertIntoBookingQueue() {
+	public void insertIntoBookingQueue(Timestamp timestamp) {
 
 		setJdbcTemplate(ds);
+		
+		String sql_1 = "insert into booking_queue(last_timestamp) values(?) where id = 0";
+		Timestamp timestamp_new = new Timestamp(System.currentTimeMillis());
+		
+		PreparedStatementSetter prep1 = new PreparedStatementSetter() {
+			@Override
+			public void setValues(java.sql.PreparedStatement prepstatement) throws SQLException {
+				prepstatement.setTimestamp(1, timestamp_new);
+			}
+		};
+
+		int n = jdbc.update(sql_1, prep1);
+		System.out.println("Update timestamp: " + n);
+		
 		String sql = "insert into booking_queue(rate_id)"
-				+ " select TBB_REFERENCE_NBR from status_summary where status_code='SS' and carrier_code in"
-				+ " (select  carrier_code from PROVIDER_CARRIER pc where pc.PROVIDER_ID in (0,1,2))"
-				+ " order by TBB_REFERENCE_NBR desc  FETCH FIRST 20 ROWS ONLY";
-		int q = jdbc.update(sql);
+				+ " select ss.TBB_REFERENCE_NBR from status_summary ss where ss.status_code='SS' and ss.carrier_code in"
+				+ " (select  pc.carrier_code from PROVIDER_CARRIER pc where pc.PROVIDER_ID in (0,1,2))"
+				+ " and ss.last_updated > ?";
+
+		PreparedStatementSetter prep = new PreparedStatementSetter() {
+			@Override
+			public void setValues(java.sql.PreparedStatement prepstatement) throws SQLException {
+				prepstatement.setTimestamp(1, timestamp);
+			}
+		};
+		int q = jdbc.update(sql, prep);
 		System.out.println(q + " rows inserted");
+
+
+
+
 	}
 }

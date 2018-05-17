@@ -1,5 +1,7 @@
 package com.banyan.FullLoadRequest.Repos;
 
+import java.sql.Timestamp;
+
 import com.banyan.FullLoadRequest.Entities.Booking;
 
 public interface BookingRepositoryCustom {
@@ -7,5 +9,5 @@ public interface BookingRepositoryCustom {
 	void saveToTrackingQueue(int bookingId, int providerId);
 	void refresh(Booking book);
 	void deleteFromBookingQueue(int rateId);
-	void insertIntoBookingQueue();
+	void insertIntoBookingQueue(Timestamp timestamp);
 }

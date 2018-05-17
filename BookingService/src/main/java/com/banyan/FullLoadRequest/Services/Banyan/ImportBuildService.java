@@ -40,18 +40,23 @@ public class ImportBuildService {
 
 		Booking books = bookService.getBooking(id);
 		if (books == null) {
-			System.out.println("ImportBook Request cannot be generated, Booking for id " + id + " does not exist in DB!");
+			System.out
+					.println("ImportBook Request cannot be generated, Booking for id " + id + " does not exist in DB!");
 			return null;
 		}
-		
+
 		fullLoad = bookService.getFullLoad(books);
 		if (fullLoad == null) {
-			System.out.println("ImportBook Request cannot be generated, Booking for id "+id+" does not have required details!");
+			System.out.println("ImportBook Request cannot be generated, Booking for id " + id
+					+ " does not have required details!");
 			return null;
-			}
+		}
 
 		authData = fullLoad.getAuthenticationData();
 		String SCAC = books.getCARRIER_CODE();
+		if (SCAC != null)
+			if (SCAC.equals("RNLO"))
+				SCAC = "RLCA";
 		String carrierName = addRepo.findCarrierNameByCode(SCAC);
 		String pro = fullLoad.getLoadinfo().getManifestID();
 		String bol = fullLoad.getLoadinfo().getBOLNumber();
@@ -65,8 +70,8 @@ public class ImportBuildService {
 
 		ImportForBook_Request importBook = new ImportForBook_Request.Builder().setAuthenticationData(authData)
 				.setQuoteInformation(quoteInfo).setPickupDateTime(null).setBOLNumber(bol).setDispatchLoad(dispatch)
-				.setDispatchOverride(dispatch).setSubmitPickup(dispatch).setProNumber(pro).setActualCarrierName(carrierName)
-				.setBillTo(fullLoad.getBillTo()).setLoadinfo(fullLoad.getLoadinfo())
+				.setDispatchOverride(dispatch).setSubmitPickup(dispatch).setProNumber(pro)
+				.setActualCarrierName(carrierName).setBillTo(fullLoad.getBillTo()).setLoadinfo(fullLoad.getLoadinfo())
 				.setRateServices(fullLoad.getRateServices()).setProducts(fullLoad.getProducts())
 				.setPackageInfo(fullLoad.getPackageInfo()).setShipper(fullLoad.getShipper())
 				.setConsignee(fullLoad.getConsignee()).setShipperAccessorials(fullLoad.getShipperAccessorials())

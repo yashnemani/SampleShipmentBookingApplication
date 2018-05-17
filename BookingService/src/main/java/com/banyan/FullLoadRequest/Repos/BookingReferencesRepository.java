@@ -14,7 +14,4 @@ public interface BookingReferencesRepository
 
 	@Query(nativeQuery = true, value = "select name from carrier where code=:code")
 	String findCarrierNameByCode(@Param("code") String carrierCode);
-
-	@Query(nativeQuery = true, value = "select rate_ID from booking_queue order by rate_ID desc")
-	List<BigDecimal> findAllFromQueue();
 }
