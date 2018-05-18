@@ -24,7 +24,7 @@ public class RequesterBuildService {
 		phone.setExt(consignee.getContactInfo().getPhoneExt());
 		String email = consignee.getContactInfo().getEmail();
 		if (email == null)
-			email = "ynemani@nexterus.com";
+			email = "ynemanii@nexterus.com";
 		String name = consignee.getContactInfo().getContactName();
 		if (name == null)
 			name = "Yash Nemani";

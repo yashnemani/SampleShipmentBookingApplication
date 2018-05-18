@@ -1,11 +1,18 @@
 package com.banyan.FullLoadRequest.Services.Banyan;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
+import com.banyan.FullLoadRequest.Entities.RateQtAddress;
 import com.banyan.FullLoadRequest.Repos.RateQtAddressRepository;
 import com.banyan.FullLoadRequest.Repos.RateQtRepository;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
@@ -60,6 +67,32 @@ public class ImportBuildService {
 		String carrierName = addRepo.findCarrierNameByCode(SCAC);
 		String pro = fullLoad.getLoadinfo().getManifestID();
 		String bol = fullLoad.getLoadinfo().getBOLNumber();
+
+		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(id);
+		RateQtAddress address = addresses.get(0);
+		Timestamp pkupDate = address.getDtProjectedPickup();
+		String PkUpDate = null;
+		if (pkupDate != null)
+			PkUpDate = pkupDate.toString();
+
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+		DateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		int year = LocalDateTime.now().getYear();
+		int month = LocalDateTime.now().getMonth().getValue();
+		int day = LocalDateTime.now().getDayOfMonth() + 1;
+		LocalDateTime pkupTime = null;
+
+		try {
+			pkupDate = new java.sql.Timestamp((dateTimeFormatter.parse(PkUpDate).getTime()));
+			if (pkupDate.toLocalDateTime().isBefore(LocalDateTime.now()))
+				pkupTime = pkupDate.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day)
+						.withSecond(10);
+			else
+				pkupTime = pkupDate.toLocalDateTime();
+			PkUpDate = pkupTime.toString();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 		CurrencyTypes currency = CurrencyTypes.US_Dollar;
 
 		quoteInfo = new QuoteInformation.Builder().setQuoteID(0).setSCAC(SCAC).setTransitTime(0).setTotalCharge(total)
@@ -69,7 +102,7 @@ public class ImportBuildService {
 				.setNote(null).setCurrencyID(currency.getValue()).build();
 
 		ImportForBook_Request importBook = new ImportForBook_Request.Builder().setAuthenticationData(authData)
-				.setQuoteInformation(quoteInfo).setPickupDateTime(null).setBOLNumber(bol).setDispatchLoad(dispatch)
+				.setQuoteInformation(quoteInfo).setPickupDateTime(PkUpDate).setBOLNumber(bol).setDispatchLoad(dispatch)
 				.setDispatchOverride(dispatch).setSubmitPickup(dispatch).setProNumber(pro)
 				.setActualCarrierName(carrierName).setBillTo(fullLoad.getBillTo()).setLoadinfo(fullLoad.getLoadinfo())
 				.setRateServices(fullLoad.getRateServices()).setProducts(fullLoad.getProducts())

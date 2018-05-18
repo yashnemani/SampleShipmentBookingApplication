@@ -75,6 +75,7 @@ public class XPO_ResponseHandleService {
 		currentStatus.setShipStatus(bookingStatus.getStatus());
 		currentStatus.setShipState("AP");
 		currentStatus.setDate(bookingStatus.getDate());
+		currentStatus.setLastUpdatedDt();
 
 		book.setStatuses(statuses);
 		book.setCurrentStatus(currentStatus);

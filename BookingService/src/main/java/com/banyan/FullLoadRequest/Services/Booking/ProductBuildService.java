@@ -27,13 +27,12 @@ public class ProductBuildService {
 
 	public Product buildProduct(RateQtDetail detail) {
 
-		Integer shippingQty = 0;
-
+		Integer shippingQty = 1;
 		Integer noSkids = detail.getNoSkids();
 		Integer noPieces = detail.getNoPieces();
 		if (noSkids != 0)
 			shippingQty = noSkids;
-		else
+		else if (noPieces != 0)
 			shippingQty = noPieces;
 
 		int addId = detail.getRtQteAddId();
@@ -42,13 +41,12 @@ public class ProductBuildService {
 		if (detailRep.findBanPkgType(addId) != null) {
 			pkgType = detailRep.findBanPkgType(addId);
 			PackageType = PackageTypes.values()[pkgType];
-			System.out.println("Package Type: " + PackageType);
 		}
 
 		FreightClasses freightClass;
 		Integer c = 50;
-		if(detail.getClassNo()!=null)
-		c = detail.getClassNo().intValue();
+		if (detail.getClassNo() != null)
+			c = detail.getClassNo().intValue();
 		String f = "c" + c;
 		freightClass = FreightClasses.valueOf(f);
 		System.out.println(freightClass.getValue());
@@ -56,20 +54,20 @@ public class ProductBuildService {
 		BigDecimal weight = null, height = null, width = null, length = null;
 		double ff = 0;
 
-		 if(detail.getWeight()!=null) 
-		ff = detail.getWeight();
+		if (detail.getWeight() != null)
+			ff = detail.getWeight();
 		weight = new BigDecimal(ff);
-		
-		if(detail.getHeight()!=null) 
-		ff = detail.getHeight();
+
+		if (detail.getHeight() != null)
+			ff = detail.getHeight();
 		height = new BigDecimal(ff);
-		
-		if(detail.getWidth()!=null) 
-		ff = detail.getWidth();
+
+		if (detail.getWidth() != null)
+			ff = detail.getWidth();
 		width = new BigDecimal(ff);
-		
-		if(detail.getLength()!=null) 
-		ff = detail.getLength();
+
+		if (detail.getLength() != null)
+			ff = detail.getLength();
 		length = new BigDecimal(ff);
 
 		boolean isHazmat = false;

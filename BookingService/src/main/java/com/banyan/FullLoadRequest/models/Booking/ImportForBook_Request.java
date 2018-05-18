@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Component
 public class ImportForBook_Request {
 
-	private java.util.Date PickupDateTime;
+	private String PickupDateTime;
 	private String BOLNumber;
 	private boolean DispatchLoad;
 	private boolean DispatchOverride;
@@ -73,7 +73,7 @@ public class ImportForBook_Request {
 
 	public static class Builder {
 
-		private java.util.Date PickupDateTime;
+		private String PickupDateTime;
 		private String BOLNumber;
 		private boolean DispatchLoad;
 		private boolean DispatchOverride;
@@ -170,7 +170,7 @@ public class ImportForBook_Request {
 			return this;
 		}
 
-		public Builder setPickupDateTime(java.util.Date PickupDateTime) {
+		public Builder setPickupDateTime(String PickupDateTime) {
 			this.PickupDateTime = PickupDateTime;
 			return this;
 		}
@@ -286,7 +286,7 @@ public class ImportForBook_Request {
 	}
 
 	@JsonProperty("PickupDateTime")
-	public java.util.Date getPickupDateTime() {
+	public String getPickupDateTime() {
 		return PickupDateTime;
 	}
 

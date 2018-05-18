@@ -37,9 +37,15 @@ public class RateServicesBuildService {
 		String shipmentType = rtQtAddress.getShipmentType();
 		String specialRequirements = rtQtAddress.getSpecialRequirements();
 		int addId = rtQtAddress.getId();
-		int shippingQty = 0;
 
-		//
+		Integer shippingQty = 1;
+		Integer noSkids = detail.getNoSkids();
+		Integer noPieces = detail.getNoPieces();
+		if (noSkids != 0)
+			shippingQty = noSkids;
+		else if (noPieces != 0)
+			shippingQty = noPieces;
+
 		if (shipmentType.equals("LTL") || shipmentType.equals("LTE"))
 			ServiceCode = ServiceCodes.LTL;
 		else if (shipmentType.equals("PKG"))
@@ -49,37 +55,22 @@ public class RateServicesBuildService {
 		else
 			ServiceCode = ServiceCodes.LTL;
 
-		//
-		int noSkids = detail.getNoSkids();
-		int noPieces = 0;
-		if(detail.getNoPieces()!=null)
-		 noPieces = detail.getNoPieces();
-		if (noSkids != 0)
-			shippingQty = noSkids;
-		else
-			shippingQty = noPieces;
-
-		//
-		
 		Integer pkgType = null;
-		if(detailRep.findBanPkgType(addId)!=null) 
-		{
-		 pkgType = detailRep.findBanPkgType(addId);
-		PackageType = PackageTypes.values()[pkgType];
-		System.out.println();
-		System.out.println("Package Type: " + PackageType);
+		if (detailRep.findBanPkgType(addId) != null) {
+			pkgType = detailRep.findBanPkgType(addId);
+			PackageType = PackageTypes.values()[pkgType];
+			System.out.println();
+			System.out.println("Package Type: " + PackageType);
 		}
-		
 
 		EquipmentType = EquipmentTypes.Other;
 		WeightUom = WeightUnitsofMeasure.LBS;
 		SizeUom = SizeUnitsofMeasure.FT;
 
-		RateServices rateService = new RateServices.Builder().setServiceCode(ServiceCode)
-				.setShippingQty(shippingQty).setPackageType(pkgType)
-				.setEquipmentType(EquipmentType.getValue()).setAdditionalWeight(null).setLength(null).setWidth(null)
-				.setHeight(null).setSpecialInstructions(specialRequirements).setSizeUom(SizeUom.getValue())
-				.setWeightUom(WeightUom.getValue()).build();
+		RateServices rateService = new RateServices.Builder().setServiceCode(ServiceCode).setShippingQty(shippingQty)
+				.setPackageType(pkgType).setEquipmentType(EquipmentType.getValue()).setAdditionalWeight(null)
+				.setLength(null).setWidth(null).setHeight(null).setSpecialInstructions(specialRequirements)
+				.setSizeUom(SizeUom.getValue()).setWeightUom(WeightUom.getValue()).build();
 
 		return rateService;
 	}

@@ -32,17 +32,25 @@ public class GenerateBookingsFromQueue {
 	@Autowired
 	PickupControlller pickupController;
 
-	Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-	@Scheduled(cron = "0 55  * * * ?")
+	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
+	int start = 0;
+
+	@Scheduled(cron = "0 5  * * * ?")
 	public void getBookingsFromQueue() {
 
-		// Get Last Timestamp from Booking Queue
-		timeStamp = bookRepo.getLastTimestamp();
+		// Get Last Timestamp from Booking Queue on Reboot
+		if (start == 0) {
+			timeStamp = bookRepo.getLastTimestamp();
+			System.out.println("Get Timestamp from Booking_Queue on Reboot: " + timeStamp);
+			start++;
+		}
+
 		// Populate Booking Queue
 		bookRepo.insertIntoBookingQueue(timeStamp);
 
 		// Retrieve IDs from Booking Queue and generate Bookings in system
 		List<BigDecimal> rateIdList = new ArrayList<>();
+		timeStamp = new Timestamp(System.currentTimeMillis());
 		rateIdList = bookRepo.findAllFromQueue();
 		System.out.println("Queue Size: " + rateIdList.size());
 		rateIdList.forEach(a -> System.out.println(a));
@@ -94,6 +102,5 @@ public class GenerateBookingsFromQueue {
 		else if (book.getPROVIDER_ID() == 2) {
 			pickupController.postUPSPickup(rateId);
 		}
-
 	}
 }

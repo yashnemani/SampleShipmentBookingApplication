@@ -70,10 +70,10 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 	public void insertIntoBookingQueue(Timestamp timestamp) {
 
 		setJdbcTemplate(ds);
-		
-		String sql_1 = "insert into booking_queue(last_timestamp) values(?) where id = 0";
+
+		String sql_1 = "update booking_queue set last_timestamp=? where id = 0";
 		Timestamp timestamp_new = new Timestamp(System.currentTimeMillis());
-		
+
 		PreparedStatementSetter prep1 = new PreparedStatementSetter() {
 			@Override
 			public void setValues(java.sql.PreparedStatement prepstatement) throws SQLException {
@@ -81,9 +81,6 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 			}
 		};
 
-		int n = jdbc.update(sql_1, prep1);
-		System.out.println("Update timestamp: " + n);
-		
 		String sql = "insert into booking_queue(rate_id)"
 				+ " select ss.TBB_REFERENCE_NBR from status_summary ss where ss.status_code='SS' and ss.carrier_code in"
 				+ " (select  pc.carrier_code from PROVIDER_CARRIER pc where pc.PROVIDER_ID in (0,1,2))"
@@ -98,8 +95,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		int q = jdbc.update(sql, prep);
 		System.out.println(q + " rows inserted");
 
-
-
-
+		int n = jdbc.update(sql_1, prep1);
+		System.out.println("Update timestamp: " + n);
 	}
 }
