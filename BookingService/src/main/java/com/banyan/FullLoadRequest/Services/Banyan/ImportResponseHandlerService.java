@@ -29,7 +29,7 @@ public class ImportResponseHandlerService {
 	@Autowired
 	BookRefSaveService refSaveService;
 
-	public void handleResponseObject(Object obj, int id) {
+	public void handleResponseObject(Object obj, int id, Timestamp pkupDt) {
 
 		Gson gson = new Gson();
 		String json = gson.toJson(obj);
@@ -49,6 +49,7 @@ public class ImportResponseHandlerService {
 			if (json2.getBoolean("Success") == true) {
 				try {
 					EstimatedDeliveryDate = json2.get("EstimatedDeliveryDate").toString();
+					System.out.println("EST Delivery: " + EstimatedDeliveryDate);
 					pickupNum = json2.getString("PickupNumber");
 				} catch (JSONException e) {
 					System.err.println(e);
@@ -123,6 +124,7 @@ public class ImportResponseHandlerService {
 			currentStatus.setShipState("AP");
 			currentStatus.setDate(bookingStatus.getDate());
 			currentStatus.setLastUpdatedDt();
+			currentStatus.setEstPickupDt(pkupDt);
 
 			book.setStatuses(statuses);
 			book.setCurrentStatus(currentStatus);

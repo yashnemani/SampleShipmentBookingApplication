@@ -21,8 +21,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.banyan.FullLoadRequest.Services.Banyan.DispatchLoadBuilderService;
 import com.banyan.FullLoadRequest.Services.Banyan.DispatchResponseHandlerService;
+import com.banyan.FullLoadRequest.Services.UPS.FreightPickup_ReqBuilderService;
 import com.banyan.FullLoadRequest.Services.UPS.PkupResponseHandleService;
 import com.banyan.FullLoadRequest.Services.UPS.UPS_PickupBuilderService;
+import com.banyan.FullLoadRequest.Services.XPO.PkupRequestBuildService;
 import com.banyan.FullLoadRequest.Services.XPO.XPO_PickupBuildService;
 import com.banyan.FullLoadRequest.Services.XPO.XPO_ResponseHandleService;
 import com.banyan.FullLoadRequest.models.Pickup.Banyan.DispatchLoad_Request;
@@ -58,6 +60,10 @@ public class PickupControlller {
 	XPO_PickupBuildService xpopickupService;
 	@Autowired
 	XPO_ResponseHandleService xpoResponseService;
+	@Autowired
+	PkupRequestBuildService xpoPkupReqService;
+	@Autowired
+	FreightPickup_ReqBuilderService upsPickupReqService;
 
 	// Call Banyan DispatchLoad to place Pickup Request
 	@GetMapping("/Banyan/DispatchLoad/{bookingId}")
@@ -113,7 +119,7 @@ public class PickupControlller {
 
 		try {
 			ResponseEntity<Object> result = restTemplate.exchange(uri, HttpMethod.POST, entity, Object.class);
-			pkupResponseService.handlePkupResponse(result.getBody(), id);
+			pkupResponseService.handlePkupResponse(result.getBody(), id, upsPickupReqService.getPkupDate());
 			System.out.println(result.getStatusCode());
 			return result.getBody();
 		} catch (HttpClientErrorException e) {
@@ -180,7 +186,7 @@ public class PickupControlller {
 		HttpEntity<XPO_PkupRequest> entity = new HttpEntity<>(xpoPickup, headers);
 		try {
 			ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
-			xpoResponseService.handlePkupResponse(response.getBody(), id);
+			xpoResponseService.handlePkupResponse(response.getBody(), id, xpoPkupReqService.getPkupDate());
 			return response.getBody();
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());

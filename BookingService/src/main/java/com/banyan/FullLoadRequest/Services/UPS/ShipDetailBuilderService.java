@@ -22,7 +22,7 @@ public class ShipDetailBuilderService {
 
 	public ShipmentDetail buildShipDetail(Product product) {
 
-		/*pkgType.setCode(product.getPackageType().toString());*/
+		/* pkgType.setCode(product.getPackageType().toString()); */
 		pkgType.setCode("BAG");
 		pkgType.setDesc(product.getDescription());
 
@@ -32,7 +32,10 @@ public class ShipDetailBuilderService {
 		weight.setUom(UOM);
 		weight.setValue(product.getWeight().toString());
 
-		shipDetail = new ShipmentDetail.Builder().setDescription(product.getDescription())
+		String desc = product.getDescription();
+		if (desc == null)
+			desc = "sample description";
+		shipDetail = new ShipmentDetail.Builder().setDescription(desc)
 				.setHazmatIndicator(String.valueOf(product.isIsHazmat()))
 				.setNmbrOfPieces(product.getQuantity().toString()).setPkgType(pkgType).setWeight(weight).build();
 		return shipDetail;

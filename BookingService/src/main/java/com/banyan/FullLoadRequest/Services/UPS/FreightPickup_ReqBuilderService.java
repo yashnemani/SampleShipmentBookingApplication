@@ -52,6 +52,12 @@ public class FreightPickup_ReqBuilderService {
 	@Autowired
 	BookingBuilderService bookService;
 
+	private Timestamp pkupDate = new Timestamp(System.currentTimeMillis());
+
+	public Timestamp getPkupDate() {
+		return pkupDate;
+	}
+
 	public FreightPickupRequest buildfreightPickup(int bookingId) {
 
 		book = bookService.getBooking(bookingId);
@@ -81,11 +87,11 @@ public class FreightPickup_ReqBuilderService {
 
 		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(bookingId);
 		RateQtAddress address = addresses.get(0);
-		Timestamp pkupDate = address.getDtProjectedPickup();
+		pkupDate = address.getDtProjectedPickup();
 		String PkUpDate = null;
 		if (pkupDate != null)
 			PkUpDate = pkupDate.toString();
-		
+
 		Timestamp futureDay = new Timestamp(System.currentTimeMillis());
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(futureDay);

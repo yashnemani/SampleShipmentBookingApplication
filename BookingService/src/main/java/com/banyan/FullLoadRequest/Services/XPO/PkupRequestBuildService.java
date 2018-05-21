@@ -4,12 +4,9 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,6 +43,11 @@ public class PkupRequestBuildService {
 	@Autowired
 	PkupItemBuildService pkupItemService;
 
+	private Timestamp pickupDate = new Timestamp(System.currentTimeMillis());
+	public Timestamp getPkupDate() {
+		return pickupDate;
+	}
+	
 	public PickupRqstInfo buildPkupRqst(FullLoad_Request fullLoad, RateQtAddress rtAddress) {
 
 		requestor = requestorService.buildRequestor(fullLoad.getShipper());
@@ -55,8 +57,6 @@ public class PkupRequestBuildService {
 
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		DateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		Date dt = new Date();
-		java.sql.Timestamp pickupDate = new java.sql.Timestamp(dt.getTime());
 		String freightReadyTime = "10:00";
 		String shipperCloseTime = "17:00";
 		if (rtAddress.getDtProjectedPickup() != null)

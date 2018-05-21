@@ -41,7 +41,7 @@ public class ImportBuildService {
 	BookingBuilderService bookService;
 
 	private BigDecimal total = new BigDecimal(15);
-
+	private Timestamp pkupDate = new Timestamp(System.currentTimeMillis());
 	// ImportBookRequest without FullLoad
 	public ImportForBook_Request buildImport(int id, boolean dispatch) {
 
@@ -70,7 +70,7 @@ public class ImportBuildService {
 
 		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(id);
 		RateQtAddress address = addresses.get(0);
-		Timestamp pkupDate = address.getDtProjectedPickup();
+		pkupDate = address.getDtProjectedPickup();
 		String PkUpDate = null;
 		if (pkupDate != null)
 			PkUpDate = pkupDate.toString();
@@ -113,5 +113,9 @@ public class ImportBuildService {
 				.setReferenceField(fullLoad.getReferenceField()).build();
 
 		return importBook;
+	}
+	
+	public Timestamp getPkupDate() {
+		return pkupDate;
 	}
 }

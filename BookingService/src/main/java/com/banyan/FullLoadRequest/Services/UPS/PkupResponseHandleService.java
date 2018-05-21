@@ -29,7 +29,7 @@ public class PkupResponseHandleService {
 	@Autowired
 	BookRefSaveService refSaveService;
 
-	public void handlePkupResponse(Object obj, int id) {
+	public void handlePkupResponse(Object obj, int id, Timestamp pkupDt) {
 
 		Gson gson = new Gson();
 		String json = gson.toJson(obj);
@@ -61,7 +61,7 @@ public class PkupResponseHandleService {
 		}
 
 		bookRefs.forEach(a -> System.out.println(" Import References: " + a.getRef_type() + ","));
-		
+
 		// Set Booking Status and Current Status
 		Set<BookingStatus> statuses = new HashSet<>();
 		BookingStatus bookingStatus = new BookingStatus();
@@ -85,6 +85,7 @@ public class PkupResponseHandleService {
 		currentStatus.setShipState("AP");
 		currentStatus.setDate(bookingStatus.getDate());
 		currentStatus.setLastUpdatedDt();
+		currentStatus.setEstPickupDt(pkupDt);
 
 		book.setStatuses(statuses);
 		book.setCurrentStatus(currentStatus);

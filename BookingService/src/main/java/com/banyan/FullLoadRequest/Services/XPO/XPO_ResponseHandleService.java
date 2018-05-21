@@ -28,7 +28,7 @@ public class XPO_ResponseHandleService {
 	@Autowired
 	BookRefSaveService refSaveService;
 
-	public void handlePkupResponse(Object obj, int id) {
+	public void handlePkupResponse(Object obj, int id, Timestamp pkupDt) {
 
 		Gson gson = new Gson();
 		String json = gson.toJson(obj);
@@ -76,6 +76,7 @@ public class XPO_ResponseHandleService {
 		currentStatus.setShipState("AP");
 		currentStatus.setDate(bookingStatus.getDate());
 		currentStatus.setLastUpdatedDt();
+		currentStatus.setEstPickupDt(pkupDt);
 
 		book.setStatuses(statuses);
 		book.setCurrentStatus(currentStatus);

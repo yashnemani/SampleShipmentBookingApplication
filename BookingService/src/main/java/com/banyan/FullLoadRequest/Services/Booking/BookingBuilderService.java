@@ -120,7 +120,8 @@ public class BookingBuilderService {
 
 			book.setStatuses(statuses);
 			book.setCurrentStatus(currentStatus);
-		}
+		} else
+			System.out.println("Booking already has a current status? " + book.getCurrentStatus().getShipStatus());
 
 		try {
 			bookRepo.save(book);

@@ -119,7 +119,7 @@ public class BookingController {
 		ResponseEntity<Object> result = null;
 		try {
 			result = restTemplate.exchange(uri, HttpMethod.POST, entity, Object.class);
-			importResponseHandler.handleResponseObject(result.getBody(), id);
+			importResponseHandler.handleResponseObject(result.getBody(), id, importService.getPkupDate());
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
