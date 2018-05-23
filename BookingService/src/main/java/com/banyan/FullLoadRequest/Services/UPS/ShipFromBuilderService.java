@@ -26,11 +26,12 @@ public class ShipFromBuilderService {
 		phone = new Phone(shipper.getContactInfo().getPhone());
 		phone.setExt(shipper.getContactInfo().getPhoneExt());
 
+		String companyName = shipper.getCompanyName();
+		/*companyName = "AMERICAN LUBE WEST";*/
 		ups_Address = addressBuildService.buildUpsAddress(shipper.getAddressInfo());
 
-		shipFrom = new ShipFrom.Builder().setAttnName(shipper.getContactInfo().getContactName())
-				.setName(shipper.getCompanyName()).setEmail(shipper.getContactInfo().getEmail()).setPhone(phone)
-				.setAddress(ups_Address).build();
+		shipFrom = new ShipFrom.Builder().setAttnName(shipper.getContactInfo().getContactName()).setName(companyName)
+				.setEmail(shipper.getContactInfo().getEmail()).setPhone(phone).setAddress(ups_Address).build();
 
 		return shipFrom;
 	}

@@ -35,7 +35,7 @@ public class GenerateBookingsFromQueue {
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
 
-	@Scheduled(cron = "0 10  * * * ?")
+	@Scheduled(cron = "0 15  * * * ?")
 	public void getBookingsFromQueue() {
 
 		// Get Last Timestamp from Booking Queue on Reboot

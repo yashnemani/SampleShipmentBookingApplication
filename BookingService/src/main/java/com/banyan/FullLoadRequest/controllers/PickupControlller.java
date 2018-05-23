@@ -176,7 +176,12 @@ public class PickupControlller {
 		xpoPickup = getXpoPickupRequest(id);
 		if (xpoPickup == null)
 			return null;
-		String url = "https://api.ltl.xpo.com/pickuprequest/1.0/cust-pickup-requests";
+		String url = "https://api.ltl.xpo.com/pickuprequest/1.0/cust-pickup-requests?testMode=Y";
+		
+		/*
+		 * String regular = "https://api.ltl.xpo.com/pickuprequest/1.0/cust-pickup-requests";
+		 * if (test == 0) url = regular;
+		 */
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", accessToken);

@@ -42,6 +42,7 @@ public class ImportBuildService {
 
 	private BigDecimal total = new BigDecimal(15);
 	private Timestamp pkupDate = new Timestamp(System.currentTimeMillis());
+
 	// ImportBookRequest without FullLoad
 	public ImportForBook_Request buildImport(int id, boolean dispatch) {
 
@@ -67,6 +68,8 @@ public class ImportBuildService {
 		String carrierName = addRepo.findCarrierNameByCode(SCAC);
 		String pro = fullLoad.getLoadinfo().getManifestID();
 		String bol = fullLoad.getLoadinfo().getBOLNumber();
+		if(bol!=null)
+		bol = bol.replaceAll("-", "");
 
 		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(id);
 		RateQtAddress address = addresses.get(0);
@@ -114,7 +117,7 @@ public class ImportBuildService {
 
 		return importBook;
 	}
-	
+
 	public Timestamp getPkupDate() {
 		return pkupDate;
 	}
