@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +69,7 @@ public class FreightPickup_ReqBuilderService {
 		fullLoad = bookService.getFullLoad(book);
 		if (fullLoad == null) {
 			System.out.println("Error generating FullLoad from given Booking!");
+			Logger.error("UPS Pickup Error generating FullLoad from given Booking! " + bookingId);
 			return null;
 		}
 
@@ -93,6 +95,13 @@ public class FreightPickup_ReqBuilderService {
 			PkUpDate = pkupDate.toString();
 
 		Timestamp futureDay = new Timestamp(System.currentTimeMillis());
+		Timestamp current = new Timestamp(System.currentTimeMillis());
+
+		Calendar c = Calendar.getInstance();
+		c.setTime(current);
+		c.add(Calendar.HOUR_OF_DAY, 1);
+		current.setTime(c.getTime().getTime());
+
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(futureDay);
 		// Needs Review
@@ -102,11 +111,12 @@ public class FreightPickup_ReqBuilderService {
 			cal.add(Calendar.DAY_OF_WEEK, 2);
 		else
 			cal.add(Calendar.DAY_OF_WEEK, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 9);
 		futureDay.setTime(cal.getTime().getTime());
 
 		if (PkUpDate != null) {
 			System.out.println("PkUpDate Timestamp " + PkUpDate);
-			if (!pkupDate.after(futureDay))
+			if (!pkupDate.after(current))
 				PkUpDate = futureDay.toString();
 		} else
 			PkUpDate = futureDay.toString();
@@ -126,6 +136,9 @@ public class FreightPickup_ReqBuilderService {
 			latestPkUpTime = "1730";
 		else
 			latestPkUpTime = latestPkUpTime.replace(":", "");
+
+		if (Integer.parseInt(latestPkUpTime) < Integer.parseInt(earliestPkUpTime))
+			latestPkUpTime = "1730";
 
 		System.out.println(PkUpDate + "  " + earliestPkUpTime + "  " + latestPkUpTime);
 		freightPickup = new FreightPickupRequest.Builder().setAdditionalComments(additionalComments)

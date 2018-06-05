@@ -22,9 +22,9 @@ public class ContactBuilderService {
 	@Autowired
 	PhoneBuildService phoneService;
 
-	public XPO_Contact buildContact(Shipper shipper) {
+	public XPO_Contact buildContact(Shipper shipper, boolean test) {
 
-		email = emailService.buildEmail(shipper.getContactInfo().getEmail());
+		email = emailService.buildEmail(shipper.getContactInfo().getEmail(), test);
 		phone = phoneService.buildPhone(shipper.getContactInfo());
 		String companyName = shipper.getCompanyName();
 		if (companyName.length() > 30)

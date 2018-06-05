@@ -4,10 +4,10 @@ import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,13 +40,23 @@ public class PkupResponseHandleService {
 			jobj = new JSONObject(json);
 
 			if (jobj.has("Fault")) {
-				System.out.println("Fault");
+				System.out.println("UPS Fault!");
+				try {
+					String error = jobj.getJSONObject("Fault").getJSONObject("detail").getJSONObject("Errors")
+							.getJSONObject("ErrorDetail").getJSONObject("PrimaryErrorCode").getString("Description");
+					System.err.println(error);
+					Logger.error("UPS Pickup Req Failed for "+id+" "+error);
+				} catch (JSONException e) {
+					System.out.println(e + " " + e.getMessage());
+					Logger.error("JSON Exception " + e.getMessage());
+				}
 				return;
 			}
 			pkupCnfmNmbr = jobj.getJSONObject("FreightPickupResponse").get("PickupRequestConfirmationNumber")
 					.toString();
 		} catch (JSONException e) {
-			System.out.println(e.getCause() + " " + e.getMessage());
+			System.out.println(e + " " + e.getMessage());
+			Logger.error("JSON Exception " + e.getMessage());
 			return;
 		}
 
@@ -94,7 +104,8 @@ public class PkupResponseHandleService {
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getCause().getMessage());
+			System.err.println(ex.getMessage());
+			Logger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,10 +54,12 @@ public class ImportResponseHandlerService {
 					pickupNum = json2.getString("PickupNumber");
 				} catch (JSONException e) {
 					System.err.println(e);
+					Logger.error("JSON Exception " + e.getMessage());
 				}
 			}
 		} catch (JSONException e) {
 			System.err.println(e);
+			Logger.error("JSON Exception " + e.getMessage());
 		}
 
 		if (!bookRepo.existsById(id)) {
@@ -100,22 +103,21 @@ public class ImportResponseHandlerService {
 		statusDates.setDt_entered(dtBooked);
 		book.setStatusDates(statusDates);
 
-		if (pickupNum != null) {
+		if (LoadID != null) {
 			// Set Booking Status and Current Status
 			Set<BookingStatus> statuses = new HashSet<>();
-			BookingStatus bookingStatus = new BookingStatus();
-			bookingStatus.setStatus("AA");
-			bookingStatus.setLocation(null);
-			bookingStatus.setMessage("Pickup Appointment Arranged ");
-			bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
-			bookingStatus.setBooking(book);
-			statuses.add(bookingStatus);
-
 			BookingCurrentStatus currentStatus = new BookingCurrentStatus();
 			if (book.getCurrentStatus() != null) {
 				System.out.println("Update Current Status");
 				currentStatus = book.getCurrentStatus();
 			}
+			BookingStatus bookingStatus = new BookingStatus();
+			bookingStatus.setStatus("XB");
+			bookingStatus.setLocation(null);
+			bookingStatus.setMessage("Shipment Booked in Banyan");
+			bookingStatus.setDate(new Timestamp(System.currentTimeMillis()));
+			bookingStatus.setBooking(book);
+			statuses.add(bookingStatus);
 			currentStatus.setBooking(book);
 			currentStatus.setLocation(bookingStatus.getLocation());
 			currentStatus.setMessage(bookingStatus.getMessage());
@@ -124,16 +126,34 @@ public class ImportResponseHandlerService {
 			currentStatus.setShipState("AP");
 			currentStatus.setDate(bookingStatus.getDate());
 			currentStatus.setLastUpdatedDt();
-			currentStatus.setEstPickupDt(pkupDt);
+			if (pickupNum != null) {
+				// Set Booking Status and Current Status
+				BookingStatus bookingStatus1 = new BookingStatus();
+				bookingStatus1.setStatus("AA");
+				bookingStatus1.setLocation(null);
+				bookingStatus1.setMessage("Pickup Appointment Arranged ");
+				bookingStatus1.setDate(new Timestamp(System.currentTimeMillis()));
+				bookingStatus1.setBooking(book);
+				statuses.add(bookingStatus1);
 
+				currentStatus.setBooking(book);
+				currentStatus.setLocation(bookingStatus1.getLocation());
+				currentStatus.setMessage(bookingStatus1.getMessage());
+				currentStatus.setStatus(bookingStatus1);
+				currentStatus.setShipStatus(bookingStatus1.getStatus());
+				currentStatus.setShipState("AP");
+				currentStatus.setDate(bookingStatus1.getDate());
+				currentStatus.setLastUpdatedDt();
+				currentStatus.setEstPickupDt(pkupDt);
+			}
 			book.setStatuses(statuses);
 			book.setCurrentStatus(currentStatus);
 		}
-
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getCause().getMessage());
+			System.err.println(ex.getMessage());
+			Logger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }

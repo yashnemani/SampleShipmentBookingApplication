@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.json.JSONException;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -123,6 +124,7 @@ public class BookingController {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
+			Logger.error("Banyan ImportBook request Failed for ID "+id+" Error: "+e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 

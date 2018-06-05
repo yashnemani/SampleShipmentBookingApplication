@@ -17,7 +17,7 @@ public class PkupItemBuildService {
 	@Autowired
 	WeightBuilderService weightService;
 
-	public PkupItem buildPkupItem(FullLoad_Request fullLoad) {
+	public PkupItem buildPkupItem(FullLoad_Request fullLoad, boolean test) {
 
 		String remarks = fullLoad.getProducts().get(0).getDescription();
 		if (remarks != null)

@@ -17,9 +17,9 @@ public class RequestorBuildService {
 	@Autowired
 	ContactBuilderService contactService;
 
-	public Requestor buildRequestor(Shipper shipper) {
+	public Requestor buildRequestor(Shipper shipper, boolean test) {
 
-		contact = contactService.buildContact(shipper);
+		contact = contactService.buildContact(shipper, test);
 		requestor.setContact(contact);
 		requestor.setRoleCd("S");
 		return requestor;

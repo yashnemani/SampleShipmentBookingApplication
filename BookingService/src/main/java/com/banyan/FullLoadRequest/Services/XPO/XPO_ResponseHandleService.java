@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,8 @@ public class XPO_ResponseHandleService {
 			jobj = new JSONObject(json);
 			pkupCnfmNmbr = jobj.getJSONObject("data").get("confirmationNbr").toString();
 		} catch (JSONException e) {
-			System.out.println(e.getCause() + " " + e.getMessage());
+			System.out.println(e);
+			Logger.error("JSON Exception " + e.getMessage());
 			return;
 		}
 
@@ -85,7 +87,8 @@ public class XPO_ResponseHandleService {
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getCause().getMessage());
+			System.err.println(ex.getMessage());
+			Logger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }

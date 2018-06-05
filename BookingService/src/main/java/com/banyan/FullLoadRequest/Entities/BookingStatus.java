@@ -3,13 +3,11 @@ package com.banyan.FullLoadRequest.Entities;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.springframework.stereotype.Component;
@@ -17,12 +15,42 @@ import org.springframework.stereotype.Component;
 @Entity
 @Component
 @Table(name = "Booking_Status", schema = "TBB")
-public class BookingStatus {
+public class BookingStatus implements Comparable<BookingStatus>{
 
 	@Id
 	@Column(name = "Booking_Status_ID")
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	private Integer id;
+
+	public BookingStatus() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BookingStatus other = (BookingStatus) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
+	}
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "booking_id")
@@ -40,8 +68,6 @@ public class BookingStatus {
 	@Column(name = "Location")
 	private String location;
 
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "status", cascade = CascadeType.ALL)
-	private BookingCurrentStatus currentStatus;
 
 	public Integer getId() {
 		return id;
@@ -91,12 +117,13 @@ public class BookingStatus {
 		this.location = location;
 	}
 
-	public BookingCurrentStatus getCurrentStatus() {
-		return currentStatus;
-	}
-
-	public void setCurrentStatus(BookingCurrentStatus currentStatus) {
-		this.currentStatus = currentStatus;
+	@Override
+	public int compareTo(BookingStatus obj) {
+		if(this.id>obj.getId())
+		return 1;
+		else if(this.id<obj.getId())
+			return -1;
+		else return 0;
 	}
 
 }

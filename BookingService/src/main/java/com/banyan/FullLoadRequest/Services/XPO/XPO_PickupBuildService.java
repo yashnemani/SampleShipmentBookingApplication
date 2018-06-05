@@ -2,6 +2,7 @@ package com.banyan.FullLoadRequest.Services.XPO;
 
 import java.util.List;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class XPO_PickupBuildService {
 	@Autowired
 	PickupRqstInfo pkupRqst;
 
-	public XPO_PkupRequest buildXpoPkupReq(int id) {
+	public XPO_PkupRequest buildXpoPkupReq(int id, boolean test) {
 
 		book = bookService.getBooking(id);
 		if (book == null) {
@@ -41,6 +42,7 @@ public class XPO_PickupBuildService {
 		fullLoad = bookService.getFullLoad(book);
 		if (fullLoad == null) {
 			System.out.println("Error generating FullLoad from given Booking!");
+			Logger.error("XPO Pickup Error generating FullLoad from given Booking! "+id);
 			return null;
 		}
 
@@ -50,10 +52,11 @@ public class XPO_PickupBuildService {
 			rtAddress = addresses.get(0);
 		else {
 			System.out.println("RateQuoteAddress does not exist for ID " + id);
+			Logger.error("XPO Pickup Error rateQuoteAddress doesn't exist "+id);
 			return null;
 		}
 
-		pkupRqst = pkupReqService.buildPkupRqst(fullLoad, rtAddress);
+		pkupRqst = pkupReqService.buildPkupRqst(fullLoad, rtAddress, test);
 		System.out.println("Timestamps ");
 		System.out.println(pkupRqst.getPkupDate() + "  " + pkupRqst.getReadyTime() + "  " + pkupRqst.getCloseTime());
 		xpoPkup = new XPO_PkupRequest(pkupRqst);

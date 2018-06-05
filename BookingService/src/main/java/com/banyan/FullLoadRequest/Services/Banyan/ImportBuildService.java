@@ -6,8 +6,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +59,7 @@ public class ImportBuildService {
 		if (fullLoad == null) {
 			System.out.println("ImportBook Request cannot be generated, Booking for id " + id
 					+ " does not have required details!");
+			Logger.error("ImportBook Request cannot be generated for " + id + " does not have required details!");
 			return null;
 		}
 
@@ -68,8 +71,8 @@ public class ImportBuildService {
 		String carrierName = addRepo.findCarrierNameByCode(SCAC);
 		String pro = fullLoad.getLoadinfo().getManifestID();
 		String bol = fullLoad.getLoadinfo().getBOLNumber();
-		if(bol!=null)
-		bol = bol.replaceAll("-", "");
+		if (bol != null)
+			bol = bol.replaceAll("-", "");
 
 		List<RateQtAddress> addresses = addRepo.FindAllByRtQteId(id);
 		RateQtAddress address = addresses.get(0);
@@ -78,22 +81,42 @@ public class ImportBuildService {
 		if (pkupDate != null)
 			PkUpDate = pkupDate.toString();
 
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		DateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		int year = LocalDateTime.now().getYear();
-		int month = LocalDateTime.now().getMonth().getValue();
-		int day = LocalDateTime.now().getDayOfMonth() + 1;
+
+		Timestamp futureDay = new Timestamp(System.currentTimeMillis());
+		Timestamp current = new Timestamp(System.currentTimeMillis());
+
+		Calendar c = Calendar.getInstance();
+		c.setTime(current);
+		c.add(Calendar.HOUR_OF_DAY, 1);
+		current.setTime(c.getTime().getTime());
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(futureDay);
+		// Needs Review
+		if (cal.get(Calendar.DAY_OF_WEEK) == 6)
+			cal.add(Calendar.DAY_OF_WEEK, 3);
+		else if (cal.get(Calendar.DAY_OF_WEEK) == 7)
+			cal.add(Calendar.DAY_OF_WEEK, 2);
+		else
+			cal.add(Calendar.DAY_OF_WEEK, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 9);
+		futureDay.setTime(cal.getTime().getTime());
 		LocalDateTime pkupTime = null;
+
+		if (PkUpDate != null) {
+			System.out.println("PkUpDate Timestamp " + PkUpDate);
+			if (!pkupDate.after(current))
+				PkUpDate = futureDay.toString();
+		} else
+			PkUpDate = futureDay.toString();
 
 		try {
 			pkupDate = new java.sql.Timestamp((dateTimeFormatter.parse(PkUpDate).getTime()));
-			if (pkupDate.toLocalDateTime().isBefore(LocalDateTime.now()))
-				pkupTime = pkupDate.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day)
-						.withSecond(10);
-			else
-				pkupTime = pkupDate.toLocalDateTime();
+			pkupTime = pkupDate.toLocalDateTime();
 			PkUpDate = pkupTime.toString();
 		} catch (ParseException e) {
+			Logger.error("Date formatter Exception " + e.getMessage());
 			e.printStackTrace();
 		}
 		CurrencyTypes currency = CurrencyTypes.US_Dollar;

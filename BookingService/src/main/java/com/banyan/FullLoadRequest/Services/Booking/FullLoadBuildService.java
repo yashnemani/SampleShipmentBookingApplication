@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -115,6 +116,7 @@ public class FullLoadBuildService {
 		addresses = addressRep.FindAllByRtQteId(qte.getId());
 		if (addresses.isEmpty()) {
 			System.out.println("Rate Quote Address does not exist for the given information.");
+			Logger.error("Rate Quote Address does not exist for "+id);
 			return null;
 		}
 		rtQtAdd = addresses.get(0);
@@ -124,6 +126,7 @@ public class FullLoadBuildService {
 		details = detailRep.findByRtQteAddId(rtQtAdd.getId());
 		if (details.isEmpty()) {
 			System.out.println("Rate Quote Detail does not exist for the given information.");
+			Logger.error("Rate Quote Detail does not exist for "+id);
 			return null;
 		}
 

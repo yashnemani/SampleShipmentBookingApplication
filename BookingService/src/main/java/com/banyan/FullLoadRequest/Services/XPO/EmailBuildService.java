@@ -14,7 +14,10 @@ public class EmailBuildService {
 	@Autowired
 	EmailVerification verifyEmailService;
 
-	public Email buildEmail(String mail) {
+	public Email buildEmail(String mail, boolean test) {
+
+		if (test == true)
+			return new Email("ynemanii@nexterus.com");
 
 		if (mail != null) {
 			if (verifyEmailService.isValidEmail(mail))

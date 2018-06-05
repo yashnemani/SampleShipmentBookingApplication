@@ -1,0 +1,3 @@
+[INFO]: [com.banyan.FullLoadRequest.FullLoadRequestApplication] main()	TinyLog Initiated....
+[INFO]: [com.banyan.FullLoadRequest.graphQL.Query] getStatuses()	GraphQl getOrderedStatuses called
+[INFO]: [com.banyan.FullLoadRequest.graphQL.Query] getShipmentDetails()	GraphQl getShipmentDetails called

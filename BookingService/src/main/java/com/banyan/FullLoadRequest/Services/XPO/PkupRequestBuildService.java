@@ -6,6 +6,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,66 +44,79 @@ public class PkupRequestBuildService {
 	@Autowired
 	PkupItemBuildService pkupItemService;
 
-	private Timestamp pickupDate = new Timestamp(System.currentTimeMillis());
+	private Timestamp pickupDate = null;
+
 	public Timestamp getPkupDate() {
 		return pickupDate;
 	}
-	
-	public PickupRqstInfo buildPkupRqst(FullLoad_Request fullLoad, RateQtAddress rtAddress) {
 
-		requestor = requestorService.buildRequestor(fullLoad.getShipper());
-		shipper = shipperService.buildShipper(fullLoad.getShipper());
-		contact = contactService.buildContact(fullLoad.getShipper());
-		pkupItem = pkupItemService.buildPkupItem(fullLoad);
+	public PickupRqstInfo buildPkupRqst(FullLoad_Request fullLoad, RateQtAddress rtAddress, boolean test) {
+
+		requestor = requestorService.buildRequestor(fullLoad.getShipper(), test);
+		shipper = shipperService.buildShipper(fullLoad.getShipper(), test);
+		contact = contactService.buildContact(fullLoad.getShipper(), test);
+		pkupItem = pkupItemService.buildPkupItem(fullLoad, test);
 
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		DateFormat dateTimeFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String freightReadyTime = "10:00";
-		String shipperCloseTime = "17:00";
-		if (rtAddress.getDtProjectedPickup() != null)
-			pickupDate = rtAddress.getDtProjectedPickup();
-		if (rtAddress.getTimeFreightReady() != null)
-			freightReadyTime = rtAddress.getTimeFreightReady();
-		if (rtAddress.getTimeFreightReady() != null)
-			shipperCloseTime = rtAddress.getTimeFreightReady();
+
+		pickupDate = rtAddress.getDtProjectedPickup();
+		String freightReadyTime = rtAddress.getTimeFreightReady();
+		String shipperCloseTime = rtAddress.getTimeShipperCloses();
+
+		if (pickupDate == null)
+			pickupDate = new Timestamp(System.currentTimeMillis());
+		if (freightReadyTime == null)
+			freightReadyTime = "10:00";
+		if (shipperCloseTime == null)
+			shipperCloseTime = "17:00";
+
 		java.sql.Timestamp readyTime = null;
 		java.sql.Timestamp closeTime = null;
-		String pkupDateStr = dateFormatter.format(pickupDate);
 		LocalDateTime pkupTime = null;
 		LocalDateTime readyTimes = null;
 		LocalDateTime closeTimes = null;
 
-		int year = LocalDateTime.now().getYear();
-		int month = LocalDateTime.now().getMonth().getValue();
-		int day = LocalDateTime.now().getDayOfMonth()+1;
-		try {
-			pickupDate = new java.sql.Timestamp((dateTimeFormatter.parse(pkupDateStr + " " + "07:00:00").getTime()));
-			readyTime = new java.sql.Timestamp(
-					(dateTimeFormatter.parse(pkupDateStr + " " + freightReadyTime + ":00")).getTime());
-			closeTime = new java.sql.Timestamp(
-					(dateTimeFormatter.parse(pkupDateStr + " " + shipperCloseTime + ":00")).getTime());
+		Timestamp futureDay = new Timestamp(System.currentTimeMillis());
+		Timestamp current = new Timestamp(System.currentTimeMillis());
+		
+		Calendar c = Calendar.getInstance();
+		c.setTime(current);
+		c.add(Calendar.HOUR_OF_DAY, 1);
+		current.setTime(c.getTime().getTime());
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(futureDay);
+		// Needs Review
+		if (cal.get(Calendar.DAY_OF_WEEK) == 6)
+			cal.add(Calendar.DAY_OF_WEEK, 3);
+		else if (cal.get(Calendar.DAY_OF_WEEK) == 7)
+			cal.add(Calendar.DAY_OF_WEEK, 2);
+		else
+			cal.add(Calendar.DAY_OF_WEEK, 1);
+		cal.set(Calendar.HOUR_OF_DAY, 9);
+		futureDay.setTime(cal.getTime().getTime());
 
-			if (pickupDate.toLocalDateTime().isBefore(LocalDateTime.now())) {
-				pkupTime = pickupDate.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day)
-						.withSecond(10);
-				readyTimes = readyTime.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day).withMinute(15)
-						.withSecond(10);
-				closeTimes = closeTime.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day).withMinute(30)
-						.withSecond(10);
-			} else {
-				pkupTime = pickupDate.toLocalDateTime().withSecond(10);
-				readyTimes = readyTime.toLocalDateTime().withMinute(15).withSecond(10);
-				closeTimes = closeTime.toLocalDateTime().withMinute(30).withSecond(10);
-			}
+		if (!pickupDate.after(current))
+			pickupDate = futureDay;
+
+		try {
+			readyTime = new java.sql.Timestamp(
+					(dateTimeFormatter.parse(dateFormatter.format(pickupDate) + " " + freightReadyTime + ":00")).getTime());
+			closeTime = new java.sql.Timestamp(
+					(dateTimeFormatter.parse(dateFormatter.format(pickupDate) + " " + shipperCloseTime + ":00")).getTime());
+
+			pkupTime = pickupDate.toLocalDateTime().withSecond(10);
+			readyTimes = readyTime.toLocalDateTime().withMinute(15).withSecond(10);
+			closeTimes = closeTime.toLocalDateTime().withMinute(30).withSecond(10);
+
 			if (readyTimes.getHour() < 6)
-				readyTimes.withHour(6);
+				readyTimes = readyTimes.withHour(6);
 			if (closeTimes.getHour() > 18)
-				closeTimes = closeTime.toLocalDateTime().withYear(year).withMonth(month).withDayOfMonth(day)
-						.withHour(18).withSecond(10);
+				closeTimes = closeTimes.withHour(18).withMinute(00);
 			System.out.println(pickupDate + "  " + readyTime + "  " + closeTime);
 			System.out.println(pkupTime + "  " + readyTimes + "  " + closeTimes);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -114,7 +128,8 @@ public class PkupRequestBuildService {
 
 		pkupRqst = new PickupRqstInfo.Builder().setPkupDate(pkupTime.toString()).setReadyTime(readyTimes.toString())
 				.setCloseTime(closeTimes.toString()).setContact(contact).setShipper(shipper).setRequestor(requestor)
-				.setPkupItem(pkupItems).setDriverNote(driverNote).setSpecialEquipmentCd("L").build();
+				.setPkupItem(pkupItems).setDriverNote(driverNote).setSpecialEquipmentCd("L").setRemarks(remarks)
+				.build();
 		return pkupRqst;
 	}
 }

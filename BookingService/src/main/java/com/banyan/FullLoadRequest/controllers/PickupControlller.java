@@ -2,6 +2,7 @@ package com.banyan.FullLoadRequest.controllers;
 
 import java.util.Arrays;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -87,6 +88,7 @@ public class PickupControlller {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
+			Logger.error("Banyan DispatchLoad request Failed for ID "+bookingId+" Error: "+e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 		return result.getBody();
@@ -125,6 +127,7 @@ public class PickupControlller {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
+			Logger.error("UPS Pickup request Failed for ID "+id+" Error: "+e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 	}
@@ -164,8 +167,8 @@ public class PickupControlller {
 	}
 
 	// Post XPO_Pickup Request to create Pickup request with XPO
-	@PostMapping("/XPO/createXpoPickup/{id}")
-	public Object createXpoPickup(@PathVariable int id) {
+	@PostMapping("/XPO/createXpoPickup/{id}/{test}")
+	public Object createXpoPickup(@PathVariable int id, @PathVariable boolean test) {
 
 		if (authToken.getAccessToken() == null) {
 			authToken = getXPOBearerToken();
@@ -173,15 +176,10 @@ public class PickupControlller {
 
 		String accessToken = "Bearer " + authToken.getAccessToken();
 		RestTemplate restTemplate = new RestTemplate();
-		xpoPickup = getXpoPickupRequest(id);
+		xpoPickup = getXpoPickupRequest(id, test);
 		if (xpoPickup == null)
 			return null;
 		String url = "https://api.ltl.xpo.com/pickuprequest/1.0/cust-pickup-requests?testMode=Y";
-		
-		/*
-		 * String regular = "https://api.ltl.xpo.com/pickuprequest/1.0/cust-pickup-requests";
-		 * if (test == 0) url = regular;
-		 */
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", accessToken);
@@ -197,18 +195,14 @@ public class PickupControlller {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
 			System.out.println(e.getResponseHeaders());
+			Logger.error("XPO Pickup request Failed for ID "+id+" Error: "+e.getMessage());
 			return e.getResponseBodyAsString();
-		} catch (HttpServerErrorException e1) {
-			System.out.println(e1.getStatusCode());
-			System.out.println(e1.getResponseBodyAsString());
-			System.out.println(e1.getResponseHeaders());
-			return e1.getResponseBodyAsString();
-		}
+		} 
 	}
 
 	// Get XPO_Pickup Request
-	@GetMapping("/XPO/getXpoPickupReq/{id}")
-	public XPO_PkupRequest getXpoPickupRequest(@PathVariable int id) {
-		return xpopickupService.buildXpoPkupReq(id);
+	@GetMapping("/XPO/getXpoPickupReq/{id}/{test}")
+	public XPO_PkupRequest getXpoPickupRequest(@PathVariable int id, @PathVariable boolean test) {
+		return xpopickupService.buildXpoPkupReq(id, test);
 	}
 }

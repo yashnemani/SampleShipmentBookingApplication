@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,7 @@ public class BookingBuilderService {
 			book.setFullLoad(fullLoad1);
 		} catch (SQLException | IOException e) {
 			e.printStackTrace();
+			Logger.error(e.getMessage());
 		}
 
 		// Save Booking Carrier Code
@@ -129,6 +131,7 @@ public class BookingBuilderService {
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());
 			System.err.println(ex);
+			Logger.error(ex.getMessage());
 			return null;
 		}
 
@@ -138,6 +141,7 @@ public class BookingBuilderService {
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());
 			System.err.println(ex);
+			Logger.error(ex.getMessage());
 		}
 		return book;
 	}
@@ -221,6 +225,7 @@ public class BookingBuilderService {
 				fullLoad1 = (FullLoad_Request) his.readObject();
 			} catch (ClassNotFoundException | IOException e) {
 				System.err.println("Deserialize FullLoad " + e.getCause().getMessage());
+				Logger.error("FullLoad Blob Error "+e.getMessage());
 			}
 		return fullLoad1;
 	}

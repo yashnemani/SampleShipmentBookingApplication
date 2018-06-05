@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class GenerateBookingsFromQueue {
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
 
-	@Scheduled(cron = "0 15  * * * ?")
+	@Scheduled(cron = "0 34 * * * ?")
 	public void getBookingsFromQueue() {
 
 		// Get Last Timestamp from Booking Queue on Reboot
@@ -47,7 +48,7 @@ public class GenerateBookingsFromQueue {
 
 		// Populate Booking Queue
 		bookRepo.insertIntoBookingQueue(timeStamp);
-
+		Logger.info("Processing a new Batch from BookingQueue...");
 		// Retrieve IDs from Booking Queue and generate Bookings in system
 		List<BigDecimal> rateIdList = new ArrayList<>();
 		timeStamp = new Timestamp(System.currentTimeMillis());
@@ -72,6 +73,7 @@ public class GenerateBookingsFromQueue {
 		fullLoad = fullLoadService.buildFullLoad(rateId);
 		if (fullLoad == null) {
 			System.out.println("FullLoad Object could not be created using the given ID " + rateId);
+			Logger.error("FullLoad Object could not be created using the given ID " + rateId);
 			return;
 		}
 
@@ -91,12 +93,13 @@ public class GenerateBookingsFromQueue {
 			try {
 				bookController.callBanyan(rateId);
 			} catch (JSONException e) {
-				System.err.println(e.getCause().getMessage());
+				System.err.println(e.getMessage());
+				Logger.error(e.getMessage());
 			}
 		}
 		// Call XPO to schedule Pickup
 		else if (book.getPROVIDER_ID() == 1) {
-			pickupController.createXpoPickup(rateId);
+			pickupController.createXpoPickup(rateId, true);
 		}
 		// Call UPS to schedule Pickup
 		else if (book.getPROVIDER_ID() == 2) {

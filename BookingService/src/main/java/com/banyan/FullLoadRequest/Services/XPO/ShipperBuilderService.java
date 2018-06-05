@@ -17,7 +17,7 @@ public class ShipperBuilderService {
 	@Autowired
 	PhoneBuildService phoneService;
 
-	public XPO_Shipper buildShipper(Shipper shipper) {
+	public XPO_Shipper buildShipper(Shipper shipper, boolean test) {
 
 		xPO_Phone = phoneService.buildPhone(shipper.getContactInfo());
 		String cntryCd = shipper.getAddressInfo().getCountryCode();
