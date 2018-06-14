@@ -1,6 +1,7 @@
 package com.banyan.FullLoadRequest.Entities;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -12,6 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "Booking_CurrentStatus", schema = "TBB")
@@ -53,6 +57,23 @@ public class BookingCurrentStatus {
 
 	@Column(name = "LAST_UPDATED")
 	private Timestamp lastUpdatedDt;
+
+	@JsonInclude()
+	@Transient
+	private String date_graph;
+
+	public String getDate_graph() {
+		return date_graph;
+	}
+
+	public void setDate_graph() {
+		Timestamp dateTime = this.getDate();
+		LocalDateTime c = null;
+		if (dateTime != null) {
+			c = dateTime.toLocalDateTime();
+			this.date_graph = c.toString();
+		}
+	}
 
 	public BookingCurrentStatus() {
 		super();

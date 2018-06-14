@@ -145,14 +145,22 @@ public class FullLoadBuildService {
 
 		load = loadService.buildLoad(rtQtAdd);
 
-		product = productService.buildProduct(detail);
+		
 		List<Product> products = new ArrayList<>();
-		products.add(product);
+		products = productService.buildProduct(details);
 
 		AuthenticationData authData = new AuthenticationData();
 		Integer clientCode = qte.getSiteClientCode();
 		Integer locNumber = qte.getSiteLocNumber();
-		String clientRefNum = clientCode.toString() + "-" + locNumber.toString();
+		String clientRefNum  = null;
+		
+		if (locNumber != null && clientCode != null)
+			clientRefNum = clientCode.toString() + "-" + locNumber.toString();
+		else if (clientCode != null)
+			clientRefNum = clientCode.toString();
+		else
+			System.out.println("ClientRefNum cannot be assigned for ..... " + clientCode + "  " + locNumber);
+		
 		authData.setClientRefNum(clientRefNum);
 		PackageInfo packageInfo = new PackageInfo(null, null);
 

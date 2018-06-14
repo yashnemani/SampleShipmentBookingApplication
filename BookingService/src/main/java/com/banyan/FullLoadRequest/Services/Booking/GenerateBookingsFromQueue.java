@@ -5,38 +5,29 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
 import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.banyan.FullLoadRequest.Entities.Booking;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
-import com.banyan.FullLoadRequest.controllers.BookingController;
-import com.banyan.FullLoadRequest.controllers.PickupControlller;
-import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
+import com.banyan.FullLoadRequest.controllers.UpdateController;
 
 @Service
 public class GenerateBookingsFromQueue {
 
 	@Autowired
-	FullLoad_Request fullLoad;
-	@Autowired
 	BookingRepository bookRepo;
 	@Autowired
-	FullLoadBuildService fullLoadService;
+	BookingHandlerService handlerService;
 	@Autowired
-	BookingBuilderService bookingService;
-	@Autowired
-	BookingController bookController;
-	@Autowired
-	PickupControlller pickupController;
+	UpdateController updateController;
 
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
 
-	@Scheduled(cron = "0 34 * * * ?")
+	@Scheduled(cron = "0 0 * * * ?")
 	public void getBookingsFromQueue() {
 
 		// Get Last Timestamp from Booking Queue on Reboot
@@ -55,55 +46,23 @@ public class GenerateBookingsFromQueue {
 		rateIdList = bookRepo.findAllFromQueue();
 		System.out.println("Queue Size: " + rateIdList.size());
 		rateIdList.forEach(a -> System.out.println(a));
-		rateIdList.forEach(a -> handleBooking(a));
+		rateIdList.forEach(a -> handlerService.handleBooking(a));
 	}
 
-	public void handleBooking(BigDecimal rateID) {
+	@Transactional
+	@Scheduled(cron = "0 42 * * * ?")
+	public void updateBanyanLoads() {
 
-		int rateId = rateID.intValue();
-
-		// If Booking with ID already exists in DB, skip and delete from queue
-		if (bookRepo.existsById(rateId)) {
-			System.out.println("Booking with ID " + rateId + " already exists!");
-			bookRepo.deleteFromBookingQueue(rateId);
-			return;
-		}
-
-		// Get FullLoad Object
-		fullLoad = fullLoadService.buildFullLoad(rateId);
-		if (fullLoad == null) {
-			System.out.println("FullLoad Object could not be created using the given ID " + rateId);
-			Logger.error("FullLoad Object could not be created using the given ID " + rateId);
-			return;
-		}
-
-		// Create Booking in DB
-		Booking book = new Booking();
-		book = bookingService.buildBooking(fullLoad, rateId);
-		if (!bookRepo.existsById(rateId)) {
-			System.out.println("Booking could not be created for the given ID " + rateId);
-			return;
-		}
-
-		// Delete Booking from booking Queue
-		bookRepo.deleteFromBookingQueue(rateId);
-
-		// Call Banyan to Book Shipment
-		if (book.getPROVIDER_ID() == 0) {
-			try {
-				bookController.callBanyan(rateId);
-			} catch (JSONException e) {
-				System.err.println(e.getMessage());
-				Logger.error(e.getMessage());
-			}
-		}
-		// Call XPO to schedule Pickup
-		else if (book.getPROVIDER_ID() == 1) {
-			pickupController.createXpoPickup(rateId, true);
-		}
-		// Call UPS to schedule Pickup
-		else if (book.getPROVIDER_ID() == 2) {
-			pickupController.postUPSPickup(rateId);
-		}
+		// Insert Bookings to be updated into Banyan Update Queue
+		bookRepo.insertIntoUpdateQueue();
+		// Insert the updated References into Booking References
+		bookRepo.insertNewBookingReferences();
+		List<BigDecimal> updateLoadList = new ArrayList<>();
+		// Get All Banyan Bookings to be updated from Update Queue
+		updateLoadList = bookRepo.getFromUpdateQueue();
+		System.out.println("Size of Update List: " + updateLoadList.size());
+		updateLoadList.forEach(u -> updateController.updateLoad(u.intValue()));
+		// Clear Banyan Update Queue
+		bookRepo.clearUpdateQueue();
 	}
 }

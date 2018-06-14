@@ -1,10 +1,7 @@
 package com.banyan.FullLoadRequest.controllers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import org.json.JSONException;
 import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -21,8 +18,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
-import com.banyan.FullLoadRequest.Entities.RateQtAddress;
-import com.banyan.FullLoadRequest.Repos.RateQtAddressRepository;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportBuildService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
@@ -54,6 +49,7 @@ public class BookingController {
 	ImportResponseHandlerService importResponseHandler;
 	@Autowired
 	GenerateBookingsFromQueue bookingQueueService;
+
 
 	// Generate FullLoadRequest Object from the given RateQuoteId
 	@GetMapping("/getFullLoadRequest/{id}/{update}")
@@ -104,11 +100,12 @@ public class BookingController {
 
 	// POST ImportBook Object to /ImportForBook Banyan API
 	@PostMapping("/callBanyan/ImportForBook_Request/{id}")
-	public Object callBanyan(@PathVariable Integer id) throws JSONException {
+	public Object callBanyan(@PathVariable Integer id) {
 
-		getImportForBook(id);
+		importBook = getImportForBook(id);
 		if (importBook == null)
 			return "ImportBook is null for given ID " + id + ". Use a valid ID to call Banyan";
+		System.out.println(importBook.getActualCarrierName());
 		final String uri = "http://ws.beta.banyantechnology.com/services/api/rest/ImportForBook";
 		RestTemplate restTemplate = new RestTemplate();
 
@@ -124,7 +121,7 @@ public class BookingController {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
-			Logger.error("Banyan ImportBook request Failed for ID "+id+" Error: "+e.getMessage());
+			Logger.error("Banyan ImportBook request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 

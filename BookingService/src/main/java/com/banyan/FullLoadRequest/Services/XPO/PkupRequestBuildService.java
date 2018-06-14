@@ -112,7 +112,7 @@ public class PkupRequestBuildService {
 
 			if (readyTimes.getHour() < 6)
 				readyTimes = readyTimes.withHour(6);
-			if (closeTimes.getHour() > 18)
+			if (closeTimes.getHour() >=18)
 				closeTimes = closeTimes.withHour(18).withMinute(00);
 			System.out.println(pickupDate + "  " + readyTime + "  " + closeTime);
 			System.out.println(pkupTime + "  " + readyTimes + "  " + closeTimes);

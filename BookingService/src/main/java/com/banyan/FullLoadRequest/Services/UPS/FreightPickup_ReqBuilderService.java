@@ -137,8 +137,11 @@ public class FreightPickup_ReqBuilderService {
 		else
 			latestPkUpTime = latestPkUpTime.replace(":", "");
 
-		if (Integer.parseInt(latestPkUpTime) < Integer.parseInt(earliestPkUpTime))
+		if ((Integer.parseInt(latestPkUpTime) - Integer.parseInt(earliestPkUpTime))<130) {
+			earliestPkUpTime = "1200";
 			latestPkUpTime = "1730";
+		}
+			
 
 		System.out.println(PkUpDate + "  " + earliestPkUpTime + "  " + latestPkUpTime);
 		freightPickup = new FreightPickupRequest.Builder().setAdditionalComments(additionalComments)

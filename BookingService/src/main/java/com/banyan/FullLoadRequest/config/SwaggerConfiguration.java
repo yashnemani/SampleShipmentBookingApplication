@@ -36,37 +36,3 @@ public class SwaggerConfiguration {
 }
 
 
-/*	
- 	@Autowired
-	ClobExRepository clobRepo;
- // Temporary CLOB Test
-@PostMapping("/saveAsClob/{id}")
-public void saveClob(@PathVariable Integer id) {
-	
-	fullLoad = fullLoadService.buildFullLoad(id);
-	if (fullLoad == null) {
-		System.out.println(id + " does not exist as a rate quote!");
-		return;
-	}
-	ClobEx clob = new ClobEx();
-	clob.setFullLoad(fullLoad);
-	System.out.println(clob.fullLoad.length());
-	clobRepo.save(clob);
-}
-
-@GetMapping("/getClob")
-public Object getClob() {
-
-	List<ClobEx> clobs = new ArrayList<>();
-	ClobEx clob = new ClobEx();
-	clobs = (List<ClobEx>) clobRepo.findAll();
-	while (clobs.size() != 0) {
-		System.out.println(clobs.size());
-		clob = clobs.get(clobs.size()-1);
-		fullLoad = clob.getFullLoad();
-		return fullLoad;
-	}
-	return null;
-}*/
-
-

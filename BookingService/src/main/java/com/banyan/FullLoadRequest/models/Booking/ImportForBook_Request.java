@@ -42,7 +42,7 @@ public class ImportForBook_Request {
 	private List<ReferenceField> ReferenceField;
 	private InsuranceInfo insuranceInfo;
 
-	private ImportForBook_Request() {
+	public ImportForBook_Request() {
 
 	}
 

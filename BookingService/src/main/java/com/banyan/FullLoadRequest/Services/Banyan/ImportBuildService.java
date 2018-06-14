@@ -65,10 +65,11 @@ public class ImportBuildService {
 
 		authData = fullLoad.getAuthenticationData();
 		String SCAC = books.getCARRIER_CODE();
+		String carrierName = addRepo.findCarrierNameByCode(SCAC);
 		if (SCAC != null)
 			if (SCAC.equals("RNLO"))
 				SCAC = "RLCA";
-		String carrierName = addRepo.findCarrierNameByCode(SCAC);
+
 		String pro = fullLoad.getLoadinfo().getManifestID();
 		String bol = fullLoad.getLoadinfo().getBOLNumber();
 		if (bol != null)

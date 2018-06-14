@@ -88,7 +88,7 @@ public class PickupControlller {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
-			Logger.error("Banyan DispatchLoad request Failed for ID "+bookingId+" Error: "+e.getMessage());
+			Logger.error("Banyan DispatchLoad request Failed for ID " + bookingId + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 		return result.getBody();
@@ -127,7 +127,7 @@ public class PickupControlller {
 		} catch (HttpClientErrorException e) {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
-			Logger.error("UPS Pickup request Failed for ID "+id+" Error: "+e.getMessage());
+			Logger.error("UPS Pickup request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 	}
@@ -166,6 +166,8 @@ public class PickupControlller {
 		return authToken;
 	}
 
+	int xpoCount = 0;
+
 	// Post XPO_Pickup Request to create Pickup request with XPO
 	@PostMapping("/XPO/createXpoPickup/{id}/{test}")
 	public Object createXpoPickup(@PathVariable int id, @PathVariable boolean test) {
@@ -183,7 +185,7 @@ public class PickupControlller {
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Authorization", accessToken);
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		/* headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON)); */
 		headers.setContentType(MediaType.APPLICATION_JSON);
 
 		HttpEntity<XPO_PkupRequest> entity = new HttpEntity<>(xpoPickup, headers);
@@ -192,12 +194,28 @@ public class PickupControlller {
 			xpoResponseService.handlePkupResponse(response.getBody(), id, xpoPkupReqService.getPkupDate());
 			return response.getBody();
 		} catch (HttpClientErrorException e) {
+			if (e.getStatusCode().value() == 401) {
+				authToken = getXPOBearerToken();
+				createXpoPickup(id, true);
+			}
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
 			System.out.println(e.getResponseHeaders());
-			Logger.error("XPO Pickup request Failed for ID "+id+" Error: "+e.getMessage());
+			Logger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
-		} 
+		} catch (HttpServerErrorException e) {
+			if (xpoCount == 0) {
+				System.out.println("500 Error! Retrying....");
+				xpoCount++;
+				createXpoPickup(id, true);
+			} else
+				xpoCount = 0;
+			System.out.println(e.getStatusCode());
+			System.out.println(e.getResponseBodyAsString());
+			System.out.println(e.getResponseHeaders());
+			Logger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
+			return e.getResponseBodyAsString();
+		}
 	}
 
 	// Get XPO_Pickup Request

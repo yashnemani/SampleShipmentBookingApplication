@@ -13,7 +13,6 @@ import java.util.Set;
 import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
 import com.banyan.FullLoadRequest.Entities.BookingCurrentStatus;
@@ -82,6 +81,7 @@ public class BookingBuilderService {
 		String scac = getCarrierCode(id);
 		if (scac == null) {
 			System.out.println("Rate Quote with ID " + id + " does not have a Carrier Code!");
+			Logger.warn("Rate Quote with ID " + id + " does not have a Carrier Code!");
 			return book;
 		}
 		book.setCARRIER_CODE(scac);

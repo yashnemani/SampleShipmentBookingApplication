@@ -1,5 +1,8 @@
 package com.banyan.FullLoadRequest.Entities;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +12,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Component
@@ -68,7 +74,23 @@ public class BookingStatus implements Comparable<BookingStatus>{
 	@Column(name = "Location")
 	private String location;
 
+	@JsonInclude()
+	@Transient
+	private String date_graph;
 
+	public String getDate_graph() {
+		return date_graph;
+	}
+
+	public void setDate_graph() {
+		Timestamp dateTime = this.getDate();
+		LocalDateTime c = null;
+		if (dateTime != null) {
+			c = dateTime.toLocalDateTime();
+			this.date_graph = c.toString();
+		}
+	}
+	
 	public Integer getId() {
 		return id;
 	}

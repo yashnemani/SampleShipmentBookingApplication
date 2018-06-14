@@ -98,4 +98,34 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		int n = jdbc.update(sql_1, prep1);
 		System.out.println("Update timestamp: " + n);
 	}
+
+	@Override
+	public void insertIntoUpdateQueue() {
+		
+		setJdbcTemplate(ds);
+		String sql = "insert into banyan_update_queue(booking_id,pro) select rt_qte_id,pro_no from rate_quote_address where rt_qte_id in "
+				+"(select booking_id from booking where provider_id=0 and booking_id not in (select booking_id from booking_reference where reference_type=0)) and pro_no is not null";
+		int rows = jdbc.update(sql);
+		System.out.println("Rows Updated in Update Queue: "+rows);
+		
+	}
+
+	@Override
+	public void insertNewBookingReferences() {
+		
+		setJdbcTemplate(ds);
+		String sql = "insert into booking_reference(booking_id,reference_type,reference) select booking_id,0,pro from banyan_update_queue";
+		int rows = jdbc.update(sql);
+		System.out.println("Number of Booking References updated: "+rows);
+		
+	}
+
+	@Override
+	public void clearUpdateQueue() {
+		
+		setJdbcTemplate(ds);
+		String sql = "delete from banyan_update_queue";
+		int rows = jdbc.update(sql);
+		System.out.println("Number of rows deleted from Update Queue "+rows);
+	}
 }

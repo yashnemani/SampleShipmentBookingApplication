@@ -23,6 +23,7 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.stereotype.Component;
 
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Component
@@ -60,6 +61,19 @@ public class Booking implements Persistable<Integer> {
 
 	@Transient
 	private boolean update;
+
+	@JsonInclude()
+	@Transient
+	private FullLoad_Request graph_FullLoad = null;
+
+	public FullLoad_Request getGraph_FullLoad() {
+		return graph_FullLoad;
+	}
+
+	public void setGraph_FullLoad(FullLoad_Request fullLoad_Request) {
+		this.graph_FullLoad = fullLoad_Request;
+		System.out.println("BOL "+this.graph_FullLoad.getLoadinfo().getBOLNumber());
+	}
 
 	public Booking() {
 	}

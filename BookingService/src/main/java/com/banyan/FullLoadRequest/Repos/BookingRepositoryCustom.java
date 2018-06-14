@@ -10,4 +10,7 @@ public interface BookingRepositoryCustom {
 	void refresh(Booking book);
 	void deleteFromBookingQueue(int rateId);
 	void insertIntoBookingQueue(Timestamp timestamp);
+	void insertIntoUpdateQueue();
+	void insertNewBookingReferences();
+	void clearUpdateQueue();
 }

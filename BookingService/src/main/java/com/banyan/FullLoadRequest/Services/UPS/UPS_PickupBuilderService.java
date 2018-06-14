@@ -3,7 +3,6 @@ package com.banyan.FullLoadRequest.Services.UPS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.banyan.FullLoadRequest.controllers.BookingController;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Pickup.UPS.FreightPickupRequest;
 import com.banyan.FullLoadRequest.models.Pickup.UPS.UPS_PickupRequest;
@@ -12,8 +11,6 @@ import com.banyan.FullLoadRequest.models.Pickup.UPS.UPS_Security;
 @Service
 public class UPS_PickupBuilderService {
 
-	@Autowired
-	BookingController bookController;
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
