@@ -1,5 +1,6 @@
 package com.banyan.FullLoadRequest.graphQL;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,10 +31,21 @@ public class Query {
 	}
 
 	@GraphQLQuery(name = "getOrderedStatuses")
-	public List<BookingStatus> getStatuses(@GraphQLArgument(name = "bookingId") int bookingId) {
+	public List<BookingStatus> getStatuses(@GraphQLArgument(name = "bookingId") Integer bookingId,
+			@GraphQLArgument(name = "scac") String scac, @GraphQLArgument(name = "ProNumber") String pro) {
 		List<BookingStatus> statuses = new ArrayList<>();
-		if (bookRepo.findById(bookingId).isPresent())
-			bookRepo.findById(bookingId).get().getStatuses().forEach(a -> statuses.add(a));
+		if (bookingId != null) {
+			if (!bookRepo.findById(bookingId).isPresent())
+				return null;
+		} else if (scac != null && pro != null) {
+			List<BigDecimal> bookings = new ArrayList<>();
+			bookings = bookRepo.getBookingByScacAndReference(scac, pro);
+			if (bookings == null)
+				return null;
+			bookingId = bookings.get(0).intValue();
+		} else
+			return null;
+		bookRepo.findById(bookingId).get().getStatuses().forEach(a -> statuses.add(a));
 		Collections.sort(statuses);
 		statuses.forEach(s -> s.setDate_graph());
 		return statuses;
