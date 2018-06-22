@@ -101,31 +101,47 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
 	@Override
 	public void insertIntoUpdateQueue() {
-		
+
 		setJdbcTemplate(ds);
 		String sql = "insert into banyan_update_queue(booking_id,pro) select rt_qte_id,pro_no from rate_quote_address where rt_qte_id in "
-				+"(select booking_id from booking where provider_id=0 and booking_id not in (select booking_id from booking_reference where reference_type=0)) and pro_no is not null";
+				+ "(select booking_id from booking where provider_id=0 and booking_id not in (select booking_id from booking_reference where reference_type=0)) and pro_no is not null";
 		int rows = jdbc.update(sql);
-		System.out.println("Rows Updated in Update Queue: "+rows);
-		
+		System.out.println("Rows Updated in Update Queue: " + rows);
+
 	}
 
 	@Override
 	public void insertNewBookingReferences() {
-		
+
 		setJdbcTemplate(ds);
-		String sql = "insert into booking_reference(booking_id,reference_type,reference) select booking_id,0,pro from banyan_update_queue";
+		String sql = "insert into booking_reference(booking_id,reference_type,reference) select booking_id,0,pro from banyan_update_queue "
+				+ "where booking_id not in(select booking_id from booking_reference where reference_type=0)";
 		int rows = jdbc.update(sql);
-		System.out.println("Number of Booking References updated: "+rows);
-		
+		System.out.println("Number of Booking References updated: " + rows);
+
 	}
 
 	@Override
 	public void clearUpdateQueue() {
-		
+
 		setJdbcTemplate(ds);
 		String sql = "delete from banyan_update_queue";
 		int rows = jdbc.update(sql);
-		System.out.println("Number of rows deleted from Update Queue "+rows);
+		System.out.println("Number of rows deleted from Update Queue " + rows);
+	}
+
+	@Override
+	public void addToUpdateQueue(Integer rateId, String pro) {
+		setJdbcTemplate(ds);
+		String sql = "insert into banyan_update_queue(booking_id,pro) values(?,?)";
+		PreparedStatementSetter prep = new PreparedStatementSetter() {
+			@Override
+			public void setValues(java.sql.PreparedStatement prepstatement) throws SQLException {
+				prepstatement.setInt(1, rateId);
+				prepstatement.setString(2, pro);
+			}
+		};
+		int rows = jdbc.update(sql, prep);
+		System.out.println("Number of rows inserted from Update Queue " + rows);
 	}
 }

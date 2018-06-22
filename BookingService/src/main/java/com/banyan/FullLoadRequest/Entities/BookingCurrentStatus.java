@@ -58,6 +58,16 @@ public class BookingCurrentStatus {
 	@Column(name = "LAST_UPDATED")
 	private Timestamp lastUpdatedDt;
 
+	@Column(name="state")
+	private String state;
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+	
 	@JsonInclude()
 	@Transient
 	private String date_graph;

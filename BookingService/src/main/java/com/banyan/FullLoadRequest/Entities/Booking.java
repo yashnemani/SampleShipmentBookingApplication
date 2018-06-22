@@ -59,22 +59,6 @@ public class Booking implements Persistable<Integer> {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "booking", cascade = CascadeType.ALL)
 	private Set<BookingStatus> statuses;
 
-	@Transient
-	private boolean update;
-
-	@JsonInclude()
-	@Transient
-	private FullLoad_Request graph_FullLoad = null;
-
-	public FullLoad_Request getGraph_FullLoad() {
-		return graph_FullLoad;
-	}
-
-	public void setGraph_FullLoad(FullLoad_Request fullLoad_Request) {
-		this.graph_FullLoad = fullLoad_Request;
-		System.out.println("BOL "+this.graph_FullLoad.getLoadinfo().getBOLNumber());
-	}
-
 	public Booking() {
 	}
 
@@ -134,15 +118,6 @@ public class Booking implements Persistable<Integer> {
 		return this.booking_id;
 	}
 
-	@Override
-	public boolean isNew() {
-		return !this.update;
-	}
-
-	public void setUpdate(boolean update) {
-		this.update = update;
-	}
-
 	public Set<BookingReferences> getReferences() {
 		return references;
 	}
@@ -175,4 +150,27 @@ public class Booking implements Persistable<Integer> {
 		this.statuses = statuses;
 	}
 
+	@Transient
+	private boolean update;
+
+	@JsonInclude()
+	@Transient
+	private FullLoad_Request graph_FullLoad = null;
+
+	public FullLoad_Request getGraph_FullLoad() {
+		return graph_FullLoad;
+	}
+
+	public void setGraph_FullLoad(FullLoad_Request fullLoad_Request) {
+		this.graph_FullLoad = fullLoad_Request;
+	}
+
+	@Override
+	public boolean isNew() {
+		return !this.update;
+	}
+
+	public void setUpdate(boolean update) {
+		this.update = update;
+	}
 }

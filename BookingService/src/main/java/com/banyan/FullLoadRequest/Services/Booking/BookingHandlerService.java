@@ -28,20 +28,15 @@ public class BookingHandlerService {
 	@Autowired
 	PickupControlller pickupController;
 
-	/*@Async("BookingExecutor")*/
+	/* @Async("BookingExecutor") */
 	public void handleBooking(BigDecimal rateID) {
 
 		int rateId = rateID.intValue();
-
-		// ThreadInfo
-		/*System.out.println("Execute method with configured executor - " + Thread.currentThread().getName());*/
+		boolean dispatch = true;
 
 		// If Booking with ID already exists in DB, skip and delete from queue
-		if (bookRepo.existsById(rateId)) {
-			System.out.println("Booking with ID " + rateId + " already exists!");
-			bookRepo.deleteFromBookingQueue(rateId);
-			return;
-		}
+		if (bookRepo.existsById(rateId))
+			dispatch = false;
 
 		// Get FullLoad Object
 		fullLoad = fullLoadService.buildFullLoad(rateId);
@@ -62,17 +57,27 @@ public class BookingHandlerService {
 		// Delete Booking from booking Queue
 		bookRepo.deleteFromBookingQueue(rateId);
 
-		// Call Banyan to Book Shipment
-		if (book.getPROVIDER_ID() == 0) {
-			bookController.callBanyan(rateId);
+		// Add to Banyan Update Queue if Booking already exists
+		if (!dispatch) {
+			if (book.getPROVIDER_ID() == 0) {
+				System.out.println("Pro Number: "+fullLoad.getLoadinfo().getManifestID());
+					bookRepo.addToUpdateQueue(rateId, fullLoad.getLoadinfo().getManifestID());
+			}
 		}
-		// Call XPO to schedule Pickup
-		else if (book.getPROVIDER_ID() == 1) {
-			pickupController.createXpoPickup(rateId, true);
-		}
-		// Call UPS to schedule Pickup
-		else if (book.getPROVIDER_ID() == 2) {
-			pickupController.postUPSPickup(rateId);
+
+		else {
+			// Call Banyan to Book Shipment
+			if (book.getPROVIDER_ID() == 0) {
+				bookController.callBanyan(rateId);
+			}
+			// Call XPO to schedule Pickup
+			else if (book.getPROVIDER_ID() == 1) {
+				pickupController.createXpoPickup(rateId, true);
+			}
+			// Call UPS to schedule Pickup
+			else if (book.getPROVIDER_ID() == 2) {
+				pickupController.postUPSPickup(rateId);
+			}
 		}
 	}
 }

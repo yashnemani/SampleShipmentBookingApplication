@@ -21,16 +21,15 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @Entity
 @Component
 @Table(name = "Booking_Status", schema = "TBB")
-public class BookingStatus implements Comparable<BookingStatus>{
+public class BookingStatus implements Comparable<BookingStatus> {
 
 	@Id
 	@Column(name = "Booking_Status_ID")
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	public BookingStatus() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -73,24 +72,17 @@ public class BookingStatus implements Comparable<BookingStatus>{
 
 	@Column(name = "Location")
 	private String location;
-
-	@JsonInclude()
-	@Transient
-	private String date_graph;
-
-	public String getDate_graph() {
-		return date_graph;
-	}
-
-	public void setDate_graph() {
-		Timestamp dateTime = this.getDate();
-		LocalDateTime c = null;
-		if (dateTime != null) {
-			c = dateTime.toLocalDateTime();
-			this.date_graph = c.toString();
-		}
-	}
 	
+	@Column(name="state")
+	private String state;
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -141,11 +133,29 @@ public class BookingStatus implements Comparable<BookingStatus>{
 
 	@Override
 	public int compareTo(BookingStatus obj) {
-		if(this.id>obj.getId())
-		return 1;
-		else if(this.id<obj.getId())
+		if (this.id > obj.getId())
+			return 1;
+		else if (this.id < obj.getId())
 			return -1;
-		else return 0;
+		else
+			return 0;
+	}
+
+	@JsonInclude()
+	@Transient
+	private String date_graph;
+
+	public String getDate_graph() {
+		return date_graph;
+	}
+
+	public void setDate_graph() {
+		Timestamp dateTime = this.getDate();
+		LocalDateTime c = null;
+		if (dateTime != null) {
+			c = dateTime.toLocalDateTime();
+			this.date_graph = c.toString();
+		}
 	}
 
 }

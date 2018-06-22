@@ -22,7 +22,7 @@ import com.banyan.FullLoadRequest.Services.Banyan.ImportBuildService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
 import com.banyan.FullLoadRequest.Services.Booking.FullLoadBuildService;
-import com.banyan.FullLoadRequest.Services.Booking.GenerateBookingsFromQueue;
+import com.banyan.FullLoadRequest.Services.Booking.BookingSchedulerService;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.ImportForBook_Request;
 
@@ -48,7 +48,7 @@ public class BookingController {
 	@Autowired
 	ImportResponseHandlerService importResponseHandler;
 	@Autowired
-	GenerateBookingsFromQueue bookingQueueService;
+	BookingSchedulerService bookingQueueService;
 
 
 	// Generate FullLoadRequest Object from the given RateQuoteId

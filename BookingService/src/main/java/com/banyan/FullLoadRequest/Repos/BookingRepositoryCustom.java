@@ -13,4 +13,5 @@ public interface BookingRepositoryCustom {
 	void insertIntoUpdateQueue();
 	void insertNewBookingReferences();
 	void clearUpdateQueue();
+	void addToUpdateQueue(Integer rateId, String pro);
 }

@@ -58,6 +58,8 @@ public class Query {
 			booking = bookRepo.findById(bookingId).get();
 			booking.setGraph_FullLoad(bookService.getFullLoad(booking));
 			booking.getCurrentStatus().setDate_graph();
+			if(booking.getStatusDates()!=null)
+			booking.getStatusDates().setGQ_Dates();
 			return booking;
 		} else
 			return null;

@@ -1,5 +1,8 @@
 package com.banyan.FullLoadRequest.Entities;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "Booking_Nxt_Status_Dates", schema = "TBB")
@@ -74,6 +80,47 @@ public class NxtStatusDates {
 
 	public void setDt_delivered(java.sql.Timestamp dt_delivered) {
 		this.dt_delivered = dt_delivered;
+	}
+	
+	@JsonInclude()
+	@Transient
+	public String gq_dt_booked;
+	@JsonInclude()
+	@Transient
+	public String gq_dt_pickedup;
+	@JsonInclude()
+	@Transient
+	public String gq_dt_delivered;
+
+	public String getGq_dt_booked() {
+		return gq_dt_booked;
+	}
+
+	public String getGq_dt_pickedup() {
+		return gq_dt_pickedup;
+	}
+
+	public String getGq_dt_delivered() {
+		return gq_dt_delivered;
+	}
+
+	public void setGQ_Dates() {
+		Timestamp dlvr = this.getDt_delivered();
+		Timestamp pkup = this.getDt_pickedup();
+		Timestamp bkd = this.getDt_entered();
+		LocalDateTime c = null;
+		if (dlvr != null) {
+			c = dlvr.toLocalDateTime();
+			this.gq_dt_delivered = c.toString();
+		}
+		if (pkup != null) {
+			c = pkup.toLocalDateTime();
+			this.gq_dt_pickedup = c.toString();
+		}
+		if (bkd != null) {
+			c = bkd.toLocalDateTime();
+			this.gq_dt_booked = c.toString();
+		}
 	}
 
 }

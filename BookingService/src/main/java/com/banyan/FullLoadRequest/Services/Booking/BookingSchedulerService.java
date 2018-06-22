@@ -15,7 +15,7 @@ import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.controllers.UpdateController;
 
 @Service
-public class GenerateBookingsFromQueue {
+public class BookingSchedulerService {
 
 	@Autowired
 	BookingRepository bookRepo;
@@ -27,7 +27,7 @@ public class GenerateBookingsFromQueue {
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
 
-	@Scheduled(cron = "0 5 * * * ?")
+	@Scheduled(cron = "0 30 * * * ?")
 	public void getBookingsFromQueue() {
 
 		// Get Last Timestamp from Booking Queue on Reboot
@@ -50,7 +50,7 @@ public class GenerateBookingsFromQueue {
 	}
 
 	@Transactional
-	@Scheduled(cron = "0 42 * * * ?")
+	@Scheduled(cron = "0 29 * * * ?")
 	public void updateBanyanLoads() {
 
 		// Insert Bookings to be updated into Banyan Update Queue

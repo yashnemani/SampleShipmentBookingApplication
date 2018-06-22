@@ -135,13 +135,15 @@ public class BookingBuilderService {
 			return null;
 		}
 
-		try {
-			if (book.getPROVIDER_ID() != 0)
-				bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
-		} catch (RuntimeException ex) {
-			System.err.println("Save Book " + ex.getCause().getMessage());
-			System.err.println(ex);
-			Logger.error(ex.getMessage());
+		if (book.isNew()) {
+			try {
+				if (book.getPROVIDER_ID() != 0)
+					bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
+			} catch (RuntimeException ex) {
+				System.err.println("Save Book " + ex.getCause().getMessage());
+				System.err.println(ex);
+				Logger.error(ex.getMessage());
+			}
 		}
 		return book;
 	}
@@ -225,7 +227,7 @@ public class BookingBuilderService {
 				fullLoad1 = (FullLoad_Request) his.readObject();
 			} catch (ClassNotFoundException | IOException e) {
 				System.err.println("Deserialize FullLoad " + e.getCause().getMessage());
-				Logger.error("FullLoad Blob Error "+e.getMessage());
+				Logger.error("FullLoad Blob Error " + e.getMessage());
 			}
 		return fullLoad1;
 	}
