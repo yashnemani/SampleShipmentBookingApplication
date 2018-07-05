@@ -7,27 +7,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Component
 public class GeoCoordinates {
 
-	private double latitude;
-	private double longitude;
+	private Integer latitude;
+	private Integer longitude;
 
 	public GeoCoordinates() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public GeoCoordinates(double latitude, double longitude) {
+	public GeoCoordinates(Integer latitude, Integer longitude) {
 		super();
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 
 	@JsonProperty("latitude")
-	public double getLatitude() {
+	public Integer getLatitude() {
 		return latitude;
 	}
 
 	@JsonProperty("longitude")
-	public double getLongitude() {
+	public Integer getLongitude() {
 		return longitude;
 	}
 }

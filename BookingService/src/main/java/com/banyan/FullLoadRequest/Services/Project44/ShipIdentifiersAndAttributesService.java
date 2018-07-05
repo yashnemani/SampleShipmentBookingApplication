@@ -38,13 +38,13 @@ public class ShipIdentifiersAndAttributesService {
 			attributes.add(at);
 		}
 
-		if (book.getReferences().stream().filter(a -> a.getRef_type() == 2).findFirst().isPresent()) {
+/*		if (book.getReferences().stream().filter(a -> a.getRef_type() == 2).findFirst().isPresent()) {
 			Attribute at = new Attribute();
 			at.setname("PURCHASE_ORDER");
 			at.setValue(
 					book.getReferences().stream().filter(a -> a.getRef_type() == 2).findFirst().get().getReference());
 			attributes.add(at);
-		}
+		}*/
 
 		if (book.getReferences().stream().filter(a -> a.getRef_type() == 11).findFirst().isPresent()) {
 			Attribute at = new Attribute();
@@ -62,10 +62,10 @@ public class ShipIdentifiersAndAttributesService {
 			attributes.add(at);
 		}
 
-		Attribute at = new Attribute();
+/*		Attribute at = new Attribute();
 		at.setname("CUSTOMER_REFERENCE");
 		at.setValue(id.toString());
-		attributes.add(at);
+		attributes.add(at);*/
 
 		// Shipment Identifiers
 		List<ShipmentIdentifier> shipmentIdentifiers = new ArrayList<>();

@@ -2,6 +2,7 @@ package com.banyan.FullLoadRequest.models.Project44;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Component
@@ -9,6 +10,7 @@ public class AppointmentWindow {
 
 	private String startDateTime;
 	private String endDateTime;
+	
 	private String localizedTimeZoneIdentifier;
 
 	public AppointmentWindow() {
@@ -40,7 +42,8 @@ public class AppointmentWindow {
 		this.endDateTime = endDateTime;
 	}
 
-	@JsonProperty("localizedTimeZoneIdentifier")
+	/*@JsonProperty("localizedTimeZoneIdentifier")*/
+	@JsonIgnore
 	public String getLocalizedTimeZoneIdentifier() {
 		return localizedTimeZoneIdentifier;
 	}

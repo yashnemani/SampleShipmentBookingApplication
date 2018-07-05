@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ApiConfiguration {
 
 	private boolean fallBackToDefaultAccountGroup;
-
 	
 	public ApiConfiguration() {
 		super();

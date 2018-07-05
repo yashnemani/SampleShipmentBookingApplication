@@ -19,6 +19,14 @@ public class CarrierIdentifierService {
 		Booking book = new Booking();
 		book = bookRepo.findById(id).get();
 		CarrierIdentifier carrierId = new CarrierIdentifier();
+
+		String dot_Number = bookRepo.getUsDotNum(book.getCARRIER_CODE());
+		if (dot_Number != null) {
+			carrierId.setType("DOT_NUMBER");
+			carrierId.setValue(dot_Number);
+			return carrierId;
+		}
+
 		carrierId.setType("SCAC");
 		carrierId.setValue(book.getCARRIER_CODE());
 		return carrierId;

@@ -82,9 +82,9 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		};
 
 		String sql = "insert into booking_queue(rate_id)"
-				+ " select ss.TBB_REFERENCE_NBR from status_summary ss where ss.status_code='SS' and ss.carrier_code in"
-				+ " (select  pc.carrier_code from PROVIDER_CARRIER pc where pc.PROVIDER_ID in (0,1,2))"
-				+ " and ss.last_updated > ?";
+				+ " select ss.TBB_REFERENCE_NBR from status_summary ss where ss.status_code='SS'"
+				+ " and ss.last_updated > ? and ss.carrier_code in "
+				+ " (select  pc.carrier_code from PROVIDER_CARRIER pc where pc.PROVIDER_ID in (0,1,2))";
 
 		PreparedStatementSetter prep = new PreparedStatementSetter() {
 			@Override
@@ -122,10 +122,16 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 	}
 
 	@Override
-	public void clearUpdateQueue() {
+	public void deleteFromUpdateQueue(String successList) {
 
 		setJdbcTemplate(ds);
-		String sql = "delete from banyan_update_queue";
+		String sql = "delete from banyan_update_queue where booking_id in "+successList;
+/*		PreparedStatementSetter prep = new PreparedStatementSetter() {
+			@Override
+			public void setValues(java.sql.PreparedStatement prepstatement) throws SQLException {
+				prepstatement.setString(1, successList);
+			}
+		};*/
 		int rows = jdbc.update(sql);
 		System.out.println("Number of rows deleted from Update Queue " + rows);
 	}

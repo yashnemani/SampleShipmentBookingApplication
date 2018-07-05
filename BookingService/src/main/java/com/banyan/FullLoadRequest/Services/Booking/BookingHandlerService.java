@@ -35,8 +35,10 @@ public class BookingHandlerService {
 		boolean dispatch = true;
 
 		// If Booking with ID already exists in DB, skip and delete from queue
-		if (bookRepo.existsById(rateId))
+		if (bookRepo.existsById(rateId)) {
 			dispatch = false;
+		}
+			
 
 		// Get FullLoad Object
 		fullLoad = fullLoadService.buildFullLoad(rateId);
@@ -49,7 +51,7 @@ public class BookingHandlerService {
 		// Create Booking in DB
 		Booking book = new Booking();
 		book = bookingService.buildBooking(fullLoad, rateId);
-		if (!bookRepo.existsById(rateId)) {
+		if (book==null||!bookRepo.existsById(rateId)) {
 			System.out.println("Booking could not be created for the given ID " + rateId);
 			return;
 		}
@@ -57,11 +59,19 @@ public class BookingHandlerService {
 		// Delete Booking from booking Queue
 		bookRepo.deleteFromBookingQueue(rateId);
 
+		if(book.getCARRIER_CODE().equals("RISF"))
+			dispatch = true;
+				
 		// Add to Banyan Update Queue if Booking already exists
 		if (!dispatch) {
 			if (book.getPROVIDER_ID() == 0) {
 				System.out.println("Pro Number: "+fullLoad.getLoadinfo().getManifestID());
-					bookRepo.addToUpdateQueue(rateId, fullLoad.getLoadinfo().getManifestID());
+				try {
+					bookRepo.addToUpdateQueue(rateId, fullLoad.getLoadinfo().getManifestID());}
+				catch(Exception e) {
+					System.out.println("Update Queue Exception "+e.getMessage());
+					Logger.error("Update Queue Exception "+e.getMessage());
+				}
 			}
 		}
 

@@ -50,7 +50,6 @@ public class BookingController {
 	@Autowired
 	BookingSchedulerService bookingQueueService;
 
-
 	// Generate FullLoadRequest Object from the given RateQuoteId
 	@GetMapping("/getFullLoadRequest/{id}/{update}")
 	public FullLoad_Request getFullLoad(@PathVariable Integer id, @PathVariable boolean update) {
@@ -106,7 +105,10 @@ public class BookingController {
 		if (importBook == null)
 			return "ImportBook is null for given ID " + id + ". Use a valid ID to call Banyan";
 		System.out.println(importBook.getActualCarrierName());
-		final String uri = "http://ws.beta.banyantechnology.com/services/api/rest/ImportForBook";
+		// Beta
+		/*final String uri = "http://ws.beta.banyantechnology.com/services/api/rest/ImportForBook";*/
+		// Production
+		 final String uri = "https://ws.logistics.banyantechnology.com/services/api/rest/ImportForBook";
 		RestTemplate restTemplate = new RestTemplate();
 
 		HttpHeaders headers = new HttpHeaders();

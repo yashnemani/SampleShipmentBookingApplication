@@ -41,4 +41,7 @@ public interface BookingRepository extends CrudRepository<Booking, Integer>, Boo
 
 	@Query(nativeQuery = true, value = "select booking_id from booking where carrier_code=:scac and booking_id in (select booking_id from booking_reference where reference=:ref)")
 	List<BigDecimal> getBookingByScacAndReference(@Param("scac") String scac, @Param("ref") String ref);
+	
+	@Query(nativeQuery = true, value = "select US_DOT_NUMBER from carrier_truckload where carrier_code=:scac")
+	String getUsDotNum(@Param("scac") String scac);
 }

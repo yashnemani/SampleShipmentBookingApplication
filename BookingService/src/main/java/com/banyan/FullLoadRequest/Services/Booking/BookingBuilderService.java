@@ -86,13 +86,17 @@ public class BookingBuilderService {
 		}
 		book.setCARRIER_CODE(scac);
 
-		// Set Booking ProviderID based on SCAC code
-		if (scac.equals("UPGF"))
-			book.setPROVIDER_ID(2);
-		else if (scac.equals("CNWY"))
-			book.setPROVIDER_ID(1);
-		else
-			book.setPROVIDER_ID(0);
+		if (fullLoad.getRateServices().get(0).getServiceCode().equals("Volume"))
+			book.setPROVIDER_ID(3);
+		else {
+			// Set Booking ProviderID based on SCAC code
+			if (scac.equals("UPGF"))
+				book.setPROVIDER_ID(2);
+			else if (scac.equals("CNWY"))
+				book.setPROVIDER_ID(1);
+			else
+				book.setPROVIDER_ID(0);
+		}
 
 		// Generate and Save Booking Reference Numbers
 		Set<BookingReferences> bookRefs = new HashSet<>();
@@ -131,7 +135,7 @@ public class BookingBuilderService {
 		} catch (RuntimeException ex) {
 			System.err.println("Save Book " + ex.getCause().getMessage());
 			System.err.println(ex);
-			Logger.error(ex.getMessage());
+			Logger.error(ex.getMessage()+" "+id);
 			return null;
 		}
 
@@ -142,7 +146,7 @@ public class BookingBuilderService {
 			} catch (RuntimeException ex) {
 				System.err.println("Save Book " + ex.getCause().getMessage());
 				System.err.println(ex);
-				Logger.error(ex.getMessage());
+				Logger.error(ex.getMessage()+" "+id);
 			}
 		}
 		return book;

@@ -10,12 +10,12 @@ public class TruckDetails {
 
 	@Autowired
 	private TruckDimensions truckDimensions;
-	private double weight ;
+	private int weight ;
 	private String weightUnitOfMeasure;
 
 	public TruckDetails() {
 		super();
-		this.weight=0;
+		this.weight=1;
 		this.weightUnitOfMeasure="LB";
 	}
 
@@ -29,11 +29,11 @@ public class TruckDetails {
 	}
 
 	@JsonProperty("weight")
-	public double getWeight() {
+	public int getWeight() {
 		return weight;
 	}
 
-	public void setWeight(double weight) {
+	public void setWeight(int weight) {
 		this.weight = weight;
 	}
 

@@ -3,6 +3,7 @@ package com.banyan.FullLoadRequest.Services.Project44;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.banyan.FullLoadRequest.models.Project44.ApiConfiguration;
 import com.banyan.FullLoadRequest.models.Project44.InitializeTruckLoad;
 import com.banyan.FullLoadRequest.models.Project44.ShippingDetails;
 
@@ -23,6 +24,8 @@ public class TruckloadInitializingService {
 	ShippingDetails shipDetails;
 	@Autowired
 	InitializeTruckLoad truckLoad;
+	@Autowired
+	ApiConfiguration apiConfiguration;
 
 	public InitializeTruckLoad buildTruckLoad(Integer id) {
 
@@ -32,6 +35,7 @@ public class TruckloadInitializingService {
 				.setEquipmentIdentifiers(equipmentService.buildEquipmentId(id))
 				.setShipmentIdentifiers(shipIdService.buildShipmentIdentifiers(id))
 				.setAttributes(shipIdService.getAttributes()).setShipmentStops(stopService.buildShipmentStops(id))
+				.setApiConfiguration(apiConfiguration)
 				.setShippingDetails(shipDetails).build();
 
 		return truckLoad;

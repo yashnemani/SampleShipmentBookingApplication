@@ -53,12 +53,12 @@ public class ImportResponseHandlerService {
 					System.out.println("EST Delivery: " + EstimatedDeliveryDate);
 					pickupNum = json2.getString("PickupNumber");
 				} catch (JSONException e) {
-					System.err.println(e);
+					System.out.println(e);
 					Logger.error("JSON Exception " + e.getMessage());
 				}
 			}
 		} catch (JSONException e) {
-			System.err.println(e);
+			System.out.println(e);
 			Logger.error("JSON Exception " + e.getMessage());
 		}
 

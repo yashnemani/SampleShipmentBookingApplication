@@ -26,17 +26,21 @@ public class UpdateController {
 	UpdateLoadService updateLoadService;
 
 	// POST Updated Booking to Banyan UpdateLoad API
-	@PostMapping("/updateLoadBanyan/{id}")
-	public Object updateLoad(@PathVariable Integer id) {
-
+	@PostMapping("/updateLoadBanyan/{id}/{type}")
+	public Object updateLoad(@PathVariable Integer id, Integer type) {
 		System.out.println("Booking to be updated " + id);
 		FullLoad_Request futureFullLoad = new FullLoad_Request();
-		futureFullLoad = getUpdateLoad(id);
+		futureFullLoad = getUpdateLoad(id, type);
 		if (futureFullLoad == null)
 			return "Booking with ID " + id + " failed to generate updateLoad Request Object";
-		final String uri = "https://ws.beta.banyantechnology.com/services/api/rest/UpdateLoad ";
-		RestTemplate restTemplate = new RestTemplate();
 
+		String uri = "https://ws.beta.banyantechnology.com/services/api/rest/UpdateLoad ";
+		if (type == 0)
+			uri = "https://ws.beta.banyantechnology.com/services/api/rest/UpdateLoad";
+		else if (type == 1)
+			uri = "https://ws.logistics.banyantechnology.com/services/api/rest/UpdateLoad";
+
+		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -49,13 +53,17 @@ public class UpdateController {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
 			Logger.error("Banyan Update Load Failed for ID " + id + " Error: " + e.getMessage());
+			if(type!=null)
+				return e.getStatusCode().toString();
 			return e.getResponseBodyAsString();
 		}
+		if(type!=null)
+			return result.getStatusCode().toString();
 		return result.getBody();
 	}
 
-	@GetMapping("/getUpdateLoad/{id}")
-	public FullLoad_Request getUpdateLoad(@PathVariable Integer id) {
-		return updateLoadService.updateLoad(id);
+	@GetMapping("/getUpdateLoad/{id}/{type}")
+	public FullLoad_Request getUpdateLoad(@PathVariable Integer id, Integer type) {
+		return updateLoadService.updateLoad(id, type);
 	}
 }

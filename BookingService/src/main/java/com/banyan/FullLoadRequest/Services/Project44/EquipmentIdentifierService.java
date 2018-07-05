@@ -12,7 +12,7 @@ public class EquipmentIdentifierService {
 
 	public List<EquipmentIdentifiers> buildEquipmentId(Integer id) {
 		
-		EquipmentIdentifiers quip = new EquipmentIdentifiers("MOBILE_PHONE_NUMBER","9199199199");
+		EquipmentIdentifiers quip = new EquipmentIdentifiers("MOBILE_PHONE_NUMBER","513-410-8284");
 		List<EquipmentIdentifiers> identifiers = new ArrayList<>();
 		identifiers.add(quip);
 	return identifiers;

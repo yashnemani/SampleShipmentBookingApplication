@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.banyan.FullLoadRequest.Entities.Booking;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
+import com.banyan.FullLoadRequest.models.Booking.AuthenticationData;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.Loadinfo;
 
@@ -21,7 +22,7 @@ public class UpdateLoadService {
 	BookingBuilderService bookingService;
 
 	@Transactional
-	public FullLoad_Request updateLoad(int bookingId) {
+	public FullLoad_Request updateLoad(int bookingId, Integer type) {
 
 		System.out.println("Booking ID: " + bookingId);
 
@@ -49,7 +50,7 @@ public class UpdateLoadService {
 				.setCustomerPO(loadinfo.getCustomerPO()).setIncoTermID(loadinfo.getIncoTermID())
 				.setInvoiceID(loadinfo.getInvoiceID()).setLoadID(Integer.parseInt(loadID)).setManifestID(pro).build();
 
-		fullLoad = new FullLoad_Request.Builder().setAuthenticationData(fullLoad.getAuthenticationData())
+		fullLoad = new FullLoad_Request.Builder().setAuthenticationData(new AuthenticationData(type))
 				.setLoadinfo(loadinfo).setBillTo(fullLoad.getBillTo()).setRateServices(fullLoad.getRateServices())
 				.setProducts(fullLoad.getProducts()).setShipper(fullLoad.getShipper())
 				.setConsignee(fullLoad.getConsignee()).setPackageInfo(fullLoad.getPackageInfo())

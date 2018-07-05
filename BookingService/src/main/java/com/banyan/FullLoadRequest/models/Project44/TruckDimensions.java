@@ -7,16 +7,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Component
 public class TruckDimensions {
 
-	private Double length;
-	private Double width;
-	private Double height;
+	private int length;
+	private int width;
+	private int height;
 	private String unitOfMeasure;
 
 	public TruckDimensions() {
 		super();
-		this.length=0.0;
-		this.width=0.0;
-		this.height=0.0;
+		this.length=1;
+		this.width=1;
+		this.height=1;
 		this.unitOfMeasure="IN";
 	}
 
@@ -29,22 +29,22 @@ public class TruckDimensions {
 
 	public static class Builder {
 
-		private Double length;
-		private Double width;
-		private Double height;
+		private int length;
+		private int width;
+		private int height;
 		private String unitOfMeasure;
 
-		public Builder setLength(Double length) {
+		public Builder setLength(int length) {
 			this.length = length;
 			return this;
 		}
 
-		public Builder setWidth(Double width) {
+		public Builder setWidth(int width) {
 			this.width = width;
 			return this;
 		}
 
-		public Builder setHeight(Double height) {
+		public Builder setHeight(int height) {
 			this.height = height;
 			return this;
 		}
@@ -60,17 +60,17 @@ public class TruckDimensions {
 	}
 
 	@JsonProperty("length")
-	public Double getLength() {
+	public int getLength() {
 		return length;
 	}
 
 	@JsonProperty("width")
-	public Double getWidth() {
+	public int getWidth() {
 		return width;
 	}
 
 	@JsonProperty("height")
-	public Double getHeight() {
+	public int getHeight() {
 		return height;
 	}
 

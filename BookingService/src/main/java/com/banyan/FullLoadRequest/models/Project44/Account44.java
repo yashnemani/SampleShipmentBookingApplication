@@ -1,7 +1,5 @@
 package com.banyan.FullLoadRequest.models.Project44;
 
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Account44 {

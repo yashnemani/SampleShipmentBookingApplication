@@ -47,8 +47,22 @@ public class AuthenticationData implements Serializable {
 	}
 
 	public AuthenticationData() {
-		Username = "NexterusWS";
-		this.Password = "N3Xt3Ru5W5";
+		// Beta
+		/* Username = "NexterusWS"; this.Password = "N3Xt3Ru5W5";*/
+
+		// Production
+		Username = "WSPROD";
+		this.Password = "Nexterus";
+	}
+	
+	public AuthenticationData(Integer type) {
+		if(type==0) {
+		// Beta
+		 Username = "NexterusWS"; this.Password = "N3Xt3Ru5W5";}
+		if(type==1) {
+		// Production
+		Username = "WSPROD";
+		this.Password = "Nexterus";}
 	}
 
 }
