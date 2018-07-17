@@ -1,0 +1,9 @@
+2018-07-17 09:46:46 [INFO]: [com.banyan.FullLoadRequest.Services.Booking.BookingSchedulerService] generateBookingsFromQueue()	Processing a new Batch from BookingQueue...
+2018-07-17 09:47:00 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:06 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:17 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:23 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:27 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:31 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:35 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.
+2018-07-17 09:47:38 [ERROR]: [com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService] handleResponseObject()	JSON Exception JSONObject["PickupNumber"] not found.

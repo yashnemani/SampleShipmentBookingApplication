@@ -65,7 +65,12 @@ public class BookingSchedulerService {
 		System.out.println("Type " + type);
 
 		// Insert Bookings to be updated into Banyan Update Queue
-		bookRepo.insertIntoUpdateQueue();
+		try {
+			bookRepo.insertIntoUpdateQueue();
+		} catch (Exception e) {
+			System.out.println("InsertToUpdateQueueException " + e.getMessage());
+			Logger.error("InsertToUpdateQueueException " + e.getMessage());
+		}
 
 		// Insert the updated References into Booking References
 		bookRepo.insertNewBookingReferences();
@@ -95,8 +100,8 @@ public class BookingSchedulerService {
 		try {
 			bookRepo.deleteFromUpdateQueue(successList);
 		} catch (Exception e) {
-			System.out.println("Exception " + e.getMessage());
-			Logger.error("Exception " + e.getMessage());
+			System.out.println("DeleteFromUpdateQueueException " + e.getMessage());
+			Logger.error("DeleteFromUpdateQueueException " + e.getMessage());
 		}
 
 		if (type == 0)
