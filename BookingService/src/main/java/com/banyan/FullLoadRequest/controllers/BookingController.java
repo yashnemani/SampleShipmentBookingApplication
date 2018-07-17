@@ -27,7 +27,6 @@ import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.ImportForBook_Request;
 
 @RestController
-@RequestMapping("/")
 public class BookingController {
 
 	// Components

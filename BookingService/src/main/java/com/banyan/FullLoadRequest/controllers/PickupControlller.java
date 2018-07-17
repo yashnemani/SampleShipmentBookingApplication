@@ -35,7 +35,6 @@ import com.banyan.FullLoadRequest.models.Pickup.XPO.XPOAccess;
 import com.banyan.FullLoadRequest.models.Pickup.XPO.XPO_PkupRequest;
 
 @RestController
-@RequestMapping("/pickup")
 public class PickupControlller {
 
 	// Models
