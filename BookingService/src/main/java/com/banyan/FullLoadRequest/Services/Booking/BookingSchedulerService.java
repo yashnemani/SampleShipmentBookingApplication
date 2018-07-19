@@ -26,9 +26,8 @@ public class BookingSchedulerService {
 
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
-	int type = 1;
 
-	@Scheduled(cron = "0 45 * * * ?")
+	@Scheduled(cron = "0 49 * * * ?")
 	public void generateBookingsFromQueue() {
 
 		// Get Last Timestamp from Booking Queue on Reboot
@@ -58,11 +57,8 @@ public class BookingSchedulerService {
 	}
 
 	@Transactional
-	@Scheduled(cron = "0 0/30 * * * ?")
+	@Scheduled(cron = "0 33 * * * ?")
 	public void updateBanyanLoads() {
-
-		// Type indicates Banyan Enviroment -> Beta||Production
-		System.out.println("Type " + type);
 
 		// Insert Bookings to be updated into Banyan Update Queue
 		try {
@@ -80,7 +76,7 @@ public class BookingSchedulerService {
 		updateLoadList = bookRepo.getFromUpdateQueue();
 		System.out.println("Size of Update List: " + updateLoadList.size());
 		List<BigDecimal> updateSuccessList = new ArrayList<>();
-		updateLoadList.stream().filter(u -> updateController.updateLoad(u.intValue(), type).equals("200"))
+		updateLoadList.stream().filter(u -> updateController.updateLoad(u.intValue()).equals("200"))
 				.forEach(a -> updateSuccessList.add(a));
 
 		String successList = "(";
@@ -103,12 +99,5 @@ public class BookingSchedulerService {
 			System.out.println("DeleteFromUpdateQueueException " + e.getMessage());
 			Logger.error("DeleteFromUpdateQueueException " + e.getMessage());
 		}
-
-		if (type == 0)
-			type = 1;
-		else
-			type = 0;
-
-		System.out.println("Type: " + type);
 	}
 }

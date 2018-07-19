@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.pmw.tinylog.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,10 @@ public class ShipmentStopService {
 		List<Integer> addressList = new ArrayList<>();
 		List<ShipmentStops> shipStops = new ArrayList<>();
 		addressList = addressRepo.findIdByRtQteId(rateId);
+		if(addressList.isEmpty()) {
+			Logger.error("No RateQuoteAddress for given BookingId: "+rateId);
+		return null;
+		}
 		stopList = stopoffRepo.findAllByRtQteAddId(addressList.get(0));
 
 		if (stopList.size() == 0) {
