@@ -7,7 +7,8 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,9 @@ import com.google.gson.Gson;
 @Service
 public class PkupResponseHandleService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(PkupResponseHandleService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	BookingRepository bookRepo;
 	@Autowired
@@ -40,23 +44,20 @@ public class PkupResponseHandleService {
 			jobj = new JSONObject(json);
 
 			if (jobj.has("Fault")) {
-				System.out.println("UPS Fault!");
+				log.warn("UPS Fault!");
 				try {
 					String error = jobj.getJSONObject("Fault").getJSONObject("detail").getJSONObject("Errors")
 							.getJSONObject("ErrorDetail").getJSONObject("PrimaryErrorCode").getString("Description");
-					System.err.println(error);
-					Logger.error("UPS Pickup Req Failed for "+id+" "+error);
+					log.warn("UPS Pickup Req Failed for "+id+" "+error);
 				} catch (JSONException e) {
-					System.out.println(e + " " + e.getMessage());
-					Logger.error("JSON Exception " + e.getMessage());
+					nxtLogger.error("JSON Exception " + e.getMessage());
 				}
 				return;
 			}
 			pkupCnfmNmbr = jobj.getJSONObject("FreightPickupResponse").get("PickupRequestConfirmationNumber")
 					.toString();
 		} catch (JSONException e) {
-			System.out.println(e + " " + e.getMessage());
-			Logger.error("JSON Exception " + e.getMessage());
+			nxtLogger.error("JSON Exception " + e.getMessage());
 			return;
 		}
 
@@ -70,7 +71,7 @@ public class PkupResponseHandleService {
 			bookRefs.add(bookRef1);
 		}
 
-		bookRefs.forEach(a -> System.out.println(" Import References: " + a.getRef_type() + ","));
+		bookRefs.forEach(a -> log.info(" Import References: " + a.getRef_type() + ","));
 
 		// Set Booking Status and Current Status
 		Set<BookingStatus> statuses = new HashSet<>();
@@ -84,7 +85,6 @@ public class PkupResponseHandleService {
 
 		BookingCurrentStatus currentStatus = new BookingCurrentStatus();
 		if (book.getCurrentStatus() != null) {
-			System.out.println("Update Current Status");
 			currentStatus = book.getCurrentStatus();
 		}
 		currentStatus.setBooking(book);
@@ -104,8 +104,7 @@ public class PkupResponseHandleService {
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getMessage());
-			Logger.error("RunTime Exception " + ex.getMessage());
+			nxtLogger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }

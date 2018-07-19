@@ -2,7 +2,8 @@ package com.banyan.FullLoadRequest.controllers;
 
 import java.util.Arrays;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,9 @@ import com.banyan.FullLoadRequest.models.Booking.ImportForBook_Request;
 
 @RestController
 public class BookingController {
-
+	
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BookingController.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
 	// Components
 	@Autowired
 	FullLoad_Request fullLoad;
@@ -64,7 +67,7 @@ public class BookingController {
 
 		fullLoad = fullLoadService.buildFullLoad(id);
 		if (fullLoad == null) {
-			System.out.println(id + " does not exist as a rate quote!");
+			logger.warn(id + " does not exist as a rate quote!");
 			return null;
 		}
 		// Save FullLoadRequest as Booking in DB
@@ -93,7 +96,7 @@ public class BookingController {
 		Booking book = null;
 		book = bookService.getBooking(id);
 		if (book == null) {
-			mailService.sendMail("Booking for ID " + id + " does not exist in DB! Try a valid BookingID");
+			nxtLogger.error("Booking for ID " + id + " does not exist in DB! Try a valid BookingID");
 			return "Booking for ID " + id + " does not exist in DB! Try a valid BookingID";}
 		fullLoad = bookService.getFullLoad(book);
 		return fullLoad;
@@ -106,7 +109,7 @@ public class BookingController {
 		importBook = getImportForBook(id);
 		if (importBook == null)
 			return "ImportBook is null for given ID " + id + ". Use a valid ID to call Banyan";
-		System.out.println(importBook.getActualCarrierName());
+		logger.info(importBook.getActualCarrierName());
 		// Beta
 		/*final String uri = "http://ws.beta.banyantechnology.com/services/api/rest/ImportForBook";*/
 		// Production
@@ -123,9 +126,9 @@ public class BookingController {
 			result = restTemplate.exchange(uri, HttpMethod.POST, entity, Object.class);
 			importResponseHandler.handleResponseObject(result.getBody(), id, importService.getPkupDate());
 		} catch (HttpClientErrorException e) {
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			Logger.error("Banyan ImportBook request Failed for ID " + id + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			nxtLogger.error("Banyan ImportBook request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 

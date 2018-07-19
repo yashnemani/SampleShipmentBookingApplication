@@ -3,6 +3,7 @@ package com.banyan.FullLoadRequest.Services.Banyan;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import com.banyan.FullLoadRequest.models.Pickup.Banyan.LoadData;
 @Service
 public class DispatchLoadBuilderService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(DispatchLoadBuilderService.class);
 	@Autowired
 	BookingReferencesRepository bookingRefRepo;
 	@Autowired
@@ -32,12 +34,12 @@ public class DispatchLoadBuilderService {
 
 		book = bookService.getBooking(bookingId);
 		if (book == null) {
-			System.out.println("booking with ID " + bookingId + " does not exist in the DB! Try a valid ID");
+			log.warn("booking with ID " + bookingId + " does not exist in the DB! Try a valid ID");
 			return null;
 		}
 		fullLoad = bookService.getFullLoad(book);
 		if (fullLoad == null) {
-			System.out.println("Error generating FullLoad from given Booking!");
+			log.warn("Error generating FullLoad from given Booking!");
 			return null;
 		}
 
@@ -46,7 +48,7 @@ public class DispatchLoadBuilderService {
 		refMap = bookingRefRepo.getReferencesByID(bookingId);
 
 		if (refMap.get("3") == null || refMap.get("12") == null || refMap.get("1") == null) {
-			System.out.println("The Booking does not have one or more required reference numbers to place DispatchLoad Request!");
+			log.warn("The Booking does not have one or more required reference numbers to place DispatchLoad Request!");
 			return null;
 		}
 			

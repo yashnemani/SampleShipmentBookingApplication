@@ -1,5 +1,6 @@
 package com.banyan.FullLoadRequest.Services.Banyan;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import com.banyan.FullLoadRequest.models.Booking.Loadinfo;
 @Service
 public class UpdateLoadService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(UpdateLoadService.class);
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
@@ -24,7 +26,7 @@ public class UpdateLoadService {
 	@Transactional
 	public FullLoad_Request updateLoad(int bookingId) {
 
-		System.out.println("Booking ID: " + bookingId);
+		log.info("Booking ID: " + bookingId);
 
 		Booking booking = new Booking();
 		booking = bookRepo.findById(bookingId).get();
@@ -36,7 +38,7 @@ public class UpdateLoadService {
 		String loadID = null;
 		if (!booking.getReferences().stream().filter(a -> a.getRef_type() == 3).findFirst().isPresent()
 				|| !booking.getReferences().stream().filter(a -> a.getRef_type() == 0).findFirst().isPresent()) {
-			System.out.println("Load ID or PRO is not available for the following Booking " + bookingId);
+			log.warn("Load ID or PRO is not available for the following Booking " + bookingId);
 			return null;
 		} else {
 			loadID = booking.getReferences().stream().filter(a -> a.getRef_type() == 3).findFirst().get()

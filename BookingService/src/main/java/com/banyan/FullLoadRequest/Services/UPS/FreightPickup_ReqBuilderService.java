@@ -4,7 +4,8 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ import com.banyan.FullLoadRequest.models.Pickup.UPS.ShipmentDetail;
 @Service
 public class FreightPickup_ReqBuilderService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(FreightPickup_ReqBuilderService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
@@ -63,13 +67,12 @@ public class FreightPickup_ReqBuilderService {
 
 		book = bookService.getBooking(bookingId);
 		if (book == null) {
-			System.out.println("booking with ID " + bookingId + " does not exist in the DB! Try a valid ID");
+			log.info("booking with ID " + bookingId + " does not exist in the DB! Try a valid ID");
 			return null;
 		}
 		fullLoad = bookService.getFullLoad(book);
 		if (fullLoad == null) {
-			System.out.println("Error generating FullLoad from given Booking!");
-			Logger.error("UPS Pickup Error generating FullLoad from given Booking! " + bookingId);
+			nxtLogger.error("UPS Pickup Error generating FullLoad from given Booking! " + bookingId);
 			return null;
 		}
 
@@ -115,7 +118,7 @@ public class FreightPickup_ReqBuilderService {
 		futureDay.setTime(cal.getTime().getTime());
 
 		if (PkUpDate != null) {
-			System.out.println("PkUpDate Timestamp " + PkUpDate);
+			log.info("PkUpDate Timestamp " + PkUpDate);
 			if (!pkupDate.after(current))
 				PkUpDate = futureDay.toString();
 		} else
@@ -123,7 +126,7 @@ public class FreightPickup_ReqBuilderService {
 
 		PkUpDate = PkUpDate.substring(0, 10);
 		PkUpDate = PkUpDate.replace("-", "");
-		System.out.println("PkUpDate Date " + PkUpDate);
+		log.info("PkUpDate Date " + PkUpDate);
 
 		String earliestPkUpTime = address.getTimeFreightReady();
 		if (earliestPkUpTime == null)
@@ -143,7 +146,7 @@ public class FreightPickup_ReqBuilderService {
 		}
 			
 
-		System.out.println(PkUpDate + "  " + earliestPkUpTime + "  " + latestPkUpTime);
+		log.info(PkUpDate + "  " + earliestPkUpTime + "  " + latestPkUpTime);
 		freightPickup = new FreightPickupRequest.Builder().setAdditionalComments(additionalComments)
 				.setDestinationCountryCode(destinationCountryCode).setDestinationPostalCode(destinationPostalCode)
 				.setDeliveryInstructions(deliveryInstructions).setPickupInstructions(pickupInstructions)

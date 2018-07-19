@@ -2,7 +2,8 @@ package com.banyan.FullLoadRequest.controllers;
 
 import java.util.Arrays;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +27,9 @@ import com.banyan.FullLoadRequest.models.Project44.InitializeTruckLoadResponse;
 
 @RestController
 public class Project44Controller {
+	
+	final org.slf4j.Logger logger = LoggerFactory.getLogger(Project44Controller.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
 	// Project 44 Testing
 	@Autowired
 	ShipmentStopService stopService;
@@ -70,9 +73,9 @@ public class Project44Controller {
 			truckLoadResponseHandler.handleResponse(id, response.getBody());
 			return response.getBody();
 		} catch (HttpClientErrorException e) {
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			Logger.error("Project44 Initialize TruckLoad Failed! " + id + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			nxtLogger.error("Project44 Initialize TruckLoad Failed! " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 	}

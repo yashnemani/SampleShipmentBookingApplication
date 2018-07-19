@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,8 @@ import com.banyan.FullLoadRequest.models.enums.CurrencyTypes;
 @Service
 public class ImportBuildService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ImportBuildService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
 	@Autowired
 	QuoteInformation quoteInfo;
 	@Autowired
@@ -50,16 +53,13 @@ public class ImportBuildService {
 
 		Booking books = bookService.getBooking(id);
 		if (books == null) {
-			System.out
-					.println("ImportBook Request cannot be generated, Booking for id " + id + " does not exist in DB!");
+			log.warn("ImportBook Request cannot be generated, Booking for id " + id + " does not exist in DB!");
 			return null;
 		}
 
 		fullLoad = bookService.getFullLoad(books);
 		if (fullLoad == null) {
-			System.out.println("ImportBook Request cannot be generated, Booking for id " + id
-					+ " does not have required details!");
-			Logger.error("ImportBook Request cannot be generated for " + id + " does not have required details!");
+			nxtLogger.error("ImportBook Request cannot be generated for " + id + " does not have required details!");
 			return null;
 		}
 
@@ -106,7 +106,7 @@ public class ImportBuildService {
 		LocalDateTime pkupTime = null;
 
 		if (PkUpDate != null) {
-			System.out.println("PkUpDate Timestamp " + PkUpDate);
+			log.info("PkUpDate Timestamp " + PkUpDate);
 			if (!pkupDate.after(current))
 				PkUpDate = futureDay.toString();
 		} else
@@ -117,7 +117,7 @@ public class ImportBuildService {
 			pkupTime = pkupDate.toLocalDateTime();
 			PkUpDate = pkupTime.toString();
 		} catch (ParseException e) {
-			Logger.error("Date formatter Exception " + e.getMessage());
+			log.warn("Date formatter Exception " + e.getMessage());
 			e.printStackTrace();
 		}
 		CurrencyTypes currency = CurrencyTypes.US_Dollar;

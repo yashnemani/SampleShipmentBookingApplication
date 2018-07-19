@@ -15,10 +15,10 @@
 	<springProperty name="errorEmailFrom"
 		source="error.email.from" defaultValue="noreply@nexterus.com" />
 	<springProperty name="errorEmailTo"
-		source="error.email.to" defaultValue="ynemani@nexterus.com" />
+		source="error.email.to" defaultValue="alldevelopers@nexterus.com" />
 	<springProperty name="errorEmailSubject"
 		source="error.email.subject"
-		defaultValue="Nxt-Booking - Critical Error Detected" />
+		defaultValue="Nxt-Finance - Critical Error Detected" />
 
 	<appender name="SAVE-TO-FILE"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -58,7 +58,14 @@
 			<level>ERROR</level>
 		</filter>
 	</appender>
-</configuration>
-   
-    
 
+	<root level="INFO">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="SAVE-TO-FILE" />
+	</root>
+	<logger name="com.nexterus" additivity="false" level="ERROR">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="SAVE-TO-FILE" />
+		<appender-ref ref="EMAIL" />
+	</logger>
+</configuration>

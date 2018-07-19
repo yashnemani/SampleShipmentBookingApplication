@@ -2,7 +2,8 @@ package com.banyan.FullLoadRequest.controllers;
 
 import java.util.Arrays;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +15,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -36,7 +36,10 @@ import com.banyan.FullLoadRequest.models.Pickup.XPO.XPO_PkupRequest;
 
 @RestController
 public class PickupControlller {
-
+	
+	final org.slf4j.Logger logger = LoggerFactory.getLogger(PickupControlller.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	// Models
 	@Autowired
 	DispatchLoad_Request dispatchLoad;
@@ -68,7 +71,7 @@ public class PickupControlller {
 	// Call Banyan DispatchLoad to place Pickup Request
 	@GetMapping("/Banyan/DispatchLoad/{bookingId}")
 	public Object dispatchLoad(@PathVariable Integer bookingId) {
-
+		
 		getDispatchLoad(bookingId);
 		if (dispatchLoad == null)
 			return "booking with ID " + bookingId + " does not exist in the DB! Cannot place DispatchLoad Request.";
@@ -85,9 +88,9 @@ public class PickupControlller {
 			result = restTemplate.exchange(uri, HttpMethod.POST, entity, Object.class);
 			dispatchResponseService.handleDispatchResponse(result.getBody(), bookingId);
 		} catch (HttpClientErrorException e) {
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			Logger.error("Banyan DispatchLoad request Failed for ID " + bookingId + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			nxtLogger.error("Banyan DispatchLoad request Failed for ID " + bookingId + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 		return result.getBody();
@@ -121,12 +124,12 @@ public class PickupControlller {
 		try {
 			ResponseEntity<Object> result = restTemplate.exchange(uri, HttpMethod.POST, entity, Object.class);
 			pkupResponseService.handlePkupResponse(result.getBody(), id, upsPickupReqService.getPkupDate());
-			System.out.println(result.getStatusCode());
+			logger.info(result.getStatusCode().toString());
 			return result.getBody();
 		} catch (HttpClientErrorException e) {
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			Logger.error("UPS Pickup request Failed for ID " + id + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			nxtLogger.error("UPS Pickup request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 	}
@@ -197,22 +200,22 @@ public class PickupControlller {
 				authToken = getXPOBearerToken();
 				createXpoPickup(id, true);
 			}
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			System.out.println(e.getResponseHeaders());
-			Logger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			logger.info(e.getResponseHeaders().toString());
+			nxtLogger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		} catch (HttpServerErrorException e) {
 			if (xpoCount == 0) {
-				System.out.println("500 Error! Retrying....");
+				logger.warn("500 Error! Retrying....");
 				xpoCount++;
 				createXpoPickup(id, true);
 			} else
 				xpoCount = 0;
-			System.out.println(e.getStatusCode());
-			System.out.println(e.getResponseBodyAsString());
-			System.out.println(e.getResponseHeaders());
-			Logger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
+			logger.info(e.getStatusCode().toString());
+			logger.info(e.getResponseBodyAsString());
+			logger.info(e.getResponseHeaders().toString());
+			nxtLogger.error("XPO Pickup request Failed for ID " + id + " Error: " + e.getMessage());
 			return e.getResponseBodyAsString();
 		}
 	}

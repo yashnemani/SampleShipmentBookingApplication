@@ -1,4 +1,4 @@
-/*package com.banyan.FullLoadRequest.config;
+package com.banyan.FullLoadRequest.config;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -52,4 +52,4 @@ public class AppConfiguration {
 			ajpConnector.setScheme("http");
 	        return ajpConnector;
 	    }
-}*/
+}

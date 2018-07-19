@@ -2,7 +2,8 @@ package com.banyan.FullLoadRequest.Services.XPO;
 
 import java.util.List;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ import com.banyan.FullLoadRequest.models.Pickup.XPO.XPO_PkupRequest;
 @Service
 public class XPO_PickupBuildService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(XPO_PickupBuildService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	XPO_PkupRequest xpoPkup;
 	@Autowired
@@ -36,13 +40,12 @@ public class XPO_PickupBuildService {
 
 		book = bookService.getBooking(id);
 		if (book == null) {
-			System.out.println("booking with ID " + id + " does not exist in the DB! Try a valid ID");
+			log.info("booking with ID " + id + " does not exist in the DB! Try a valid ID");
 			return null;
 		}
 		fullLoad = bookService.getFullLoad(book);
 		if (fullLoad == null) {
-			System.out.println("Error generating FullLoad from given Booking!");
-			Logger.error("XPO Pickup Error generating FullLoad from given Booking! "+id);
+			nxtLogger.error("XPO Pickup Error generating FullLoad from given Booking! "+id);
 			return null;
 		}
 
@@ -51,14 +54,13 @@ public class XPO_PickupBuildService {
 		if (addresses != null)
 			rtAddress = addresses.get(0);
 		else {
-			System.out.println("RateQuoteAddress does not exist for ID " + id);
-			Logger.error("XPO Pickup Error rateQuoteAddress doesn't exist "+id);
+			nxtLogger.error("XPO Pickup Error rateQuoteAddress doesn't exist "+id);
 			return null;
 		}
 
 		pkupRqst = pkupReqService.buildPkupRqst(fullLoad, rtAddress, test);
-		System.out.println("Timestamps ");
-		System.out.println(pkupRqst.getPkupDate() + "  " + pkupRqst.getReadyTime() + "  " + pkupRqst.getCloseTime());
+		log.info("Timestamps ");
+		log.info(pkupRqst.getPkupDate() + "  " + pkupRqst.getReadyTime() + "  " + pkupRqst.getCloseTime());
 		xpoPkup = new XPO_PkupRequest(pkupRqst);
 		return xpoPkup;
 	}

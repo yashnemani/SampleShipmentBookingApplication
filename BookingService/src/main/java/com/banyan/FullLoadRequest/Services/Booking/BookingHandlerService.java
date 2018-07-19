@@ -2,7 +2,8 @@ package com.banyan.FullLoadRequest.Services.Booking;
 
 import java.math.BigDecimal;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 @Service
 public class BookingHandlerService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(BookingHandlerService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
@@ -43,8 +47,7 @@ public class BookingHandlerService {
 		// Get FullLoad Object
 		fullLoad = fullLoadService.buildFullLoad(rateId);
 		if (fullLoad == null) {
-			System.out.println("FullLoad Object could not be created using the given ID " + rateId);
-			Logger.error("FullLoad Object could not be created using the given ID " + rateId);
+			nxtLogger.error("FullLoad Object could not be created using the given ID " + rateId);
 			return;
 		}
 
@@ -52,7 +55,7 @@ public class BookingHandlerService {
 		Booking book = new Booking();
 		book = bookingService.buildBooking(fullLoad, rateId);
 		if (book==null||!bookRepo.existsById(rateId)) {
-			System.out.println("Booking could not be created for the given ID " + rateId);
+			log.warn("Booking could not be created for the given ID " + rateId);
 			return;
 		}
 
@@ -65,12 +68,11 @@ public class BookingHandlerService {
 		// Add to Banyan Update Queue if Booking already exists
 		if (!dispatch) {
 			if (book.getPROVIDER_ID() == 0) {
-				System.out.println("Pro Number: "+fullLoad.getLoadinfo().getManifestID());
+				log.info("Pro Number: "+fullLoad.getLoadinfo().getManifestID());
 				try {
 					bookRepo.addToUpdateQueue(rateId, fullLoad.getLoadinfo().getManifestID());}
 				catch(Exception e) {
-					System.out.println("Update Queue Exception "+e.getMessage());
-					Logger.error("Update Queue Exception "+e.getMessage());
+					nxtLogger.error("Update Queue Exception "+e.getMessage());
 				}
 			}
 		}

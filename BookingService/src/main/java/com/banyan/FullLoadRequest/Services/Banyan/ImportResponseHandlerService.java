@@ -7,7 +7,8 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ import com.google.gson.Gson;
 @Service
 public class ImportResponseHandlerService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ImportResponseHandlerService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	BookingRepository bookRepo;
 	@Autowired
@@ -50,20 +54,18 @@ public class ImportResponseHandlerService {
 			if (json2.getBoolean("Success") == true) {
 				try {
 					EstimatedDeliveryDate = json2.get("EstimatedDeliveryDate").toString();
-					System.out.println("EST Delivery: " + EstimatedDeliveryDate);
+					log.info("EST Delivery: " + EstimatedDeliveryDate);
 					pickupNum = json2.getString("PickupNumber");
 				} catch (JSONException e) {
-					System.out.println(e);
-					Logger.error("JSON Exception " + e.getMessage());
+					nxtLogger.error("JSON Exception " + e.getMessage());
 				}
 			}
 		} catch (JSONException e) {
-			System.out.println(e);
-			Logger.error("JSON Exception " + e.getMessage());
+			nxtLogger.error("JSON Exception " + e.getMessage());
 		}
 
 		if (!bookRepo.existsById(id)) {
-			System.out.println("Unable to find Booking in DB with ID: " + id);
+			log.info("Unable to find Booking in DB with ID: " + id);
 			return;
 		}
 		Set<BookingReferences> bookRefs = new HashSet<>();
@@ -89,7 +91,7 @@ public class ImportResponseHandlerService {
 			bookRefs.add(bookRef1);
 		}
 
-		bookRefs.forEach(a -> System.out.println(" Import References: " + a.getRef_type() + ","));
+		bookRefs.forEach(a -> log.info(" Import References: " + a.getRef_type() + ","));
 		book.setReferences(bookRefs);
 
 		// Status Dates - Booking Date with Banyan
@@ -108,7 +110,6 @@ public class ImportResponseHandlerService {
 			Set<BookingStatus> statuses = new HashSet<>();
 			BookingCurrentStatus currentStatus = new BookingCurrentStatus();
 			if (book.getCurrentStatus() != null) {
-				System.out.println("Update Current Status");
 				currentStatus = book.getCurrentStatus();
 			}
 			BookingStatus bookingStatus = new BookingStatus();
@@ -152,8 +153,7 @@ public class ImportResponseHandlerService {
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getMessage());
-			Logger.error("RunTime Exception " + ex.getMessage());
+			nxtLogger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }

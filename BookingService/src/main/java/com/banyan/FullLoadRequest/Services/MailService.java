@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MailService {
+	
 	private static final Logger log = LoggerFactory.getLogger(MailService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
 
 	private String errorEmailFrom;
 	private String errorEmailTo;
@@ -62,10 +64,10 @@ public class MailService {
 			if (log.isInfoEnabled()) log.info("Email sent successfully.");
 			
 		} catch (MessagingException me) {
-			log.error("Error creating email message. " + me.getMessage());
+			nxtLogger.error("Error creating email message. " + me.getMessage());
 			throw new MailParseException(me);
 		} catch (MailException ex) {
-			log.error("Error sending email to ..." + to + ". " + ex.getMessage());
+			nxtLogger.error("Error sending email to ..." + to + ". " + ex.getMessage());
 		}
 	}
 	

@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -19,6 +20,7 @@ import com.banyan.FullLoadRequest.Repos.BookingRepositoryCustom;
 @Service
 public class BookingRepositoryImpl implements BookingRepositoryCustom {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(BookingRepositoryImpl.class);
 	@PersistenceContext
 	private EntityManager em;
 	@Autowired
@@ -96,7 +98,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		System.out.println(q + " rows inserted");
 
 		int n = jdbc.update(sql_1, prep1);
-		System.out.println("Update timestamp: " + n);
+		log.info("Update timestamp: " + n);
 	}
 
 	@Override
@@ -106,7 +108,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 		String sql = "insert into banyan_update_queue(booking_id,pro) select rt_qte_id,pro_no from rate_quote_address where rt_qte_id in "
 				+ "(select booking_id from booking where provider_id=0 and booking_id not in (select booking_id from booking_reference where reference_type=0)) and pro_no is not null";
 		int rows = jdbc.update(sql);
-		System.out.println("Rows Updated in Update Queue: " + rows);
+		log.info("Rows Updated in Update Queue: " + rows);
 
 	}
 
@@ -133,7 +135,7 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 			}
 		};*/
 		int rows = jdbc.update(sql);
-		System.out.println("Number of rows deleted from Update Queue " + rows);
+		log.debug("Number of rows deleted from Update Queue " + rows);
 	}
 
 	@Override
@@ -148,6 +150,6 @@ public class BookingRepositoryImpl implements BookingRepositoryCustom {
 			}
 		};
 		int rows = jdbc.update(sql, prep);
-		System.out.println("Number of rows inserted from Update Queue " + rows);
+		log.debug("Number of rows inserted from Update Queue " + rows);
 	}
 }

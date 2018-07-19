@@ -1,6 +1,5 @@
 package com.banyan.FullLoadRequest.RepoImpl;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,6 +9,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -26,6 +26,7 @@ import com.banyan.FullLoadRequest.models.Booking.Loadinfo;
 @Repository
 public class RateQtRepositoryImpl implements RateQtRepositoryCustom {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(RateQtRepositoryImpl.class);
 	@Autowired
 	DataSource ds;
 	@Autowired
@@ -58,9 +59,8 @@ public class RateQtRepositoryImpl implements RateQtRepositoryCustom {
 
 		List<String> acc_Codes = new ArrayList<>();
 		acc_Codes = jdbc.query(sql, prep, new AccRowMapper());
-		System.out.println();
-		System.out.print("FusionCenter Access Charge Codes:");
-		acc_Codes.forEach(i -> System.out.print(" "+i+","));
+		log.info("FusionCenter Access Charge Codes:");
+		acc_Codes.forEach(i -> log.info(" "+i+","));
 
 		return acc_Codes;
 	}
@@ -100,9 +100,8 @@ public class RateQtRepositoryImpl implements RateQtRepositoryCustom {
 			if (code.size() != 0)
 				banyanAccCodes.add(code.get(0));
 		}
-		System.out.println();
-		System.out.print("Banyan Charge Codes: ");
-		banyanAccCodes.forEach(i -> System.out.print(" "+i+","));
+		log.info("Banyan Charge Codes: ");
+		banyanAccCodes.forEach(i -> log.info(" "+i+","));
 
 		return banyanAccCodes;
 	}
@@ -138,7 +137,7 @@ public class RateQtRepositoryImpl implements RateQtRepositoryCustom {
 		SqlParameterSource in = new MapSqlParameterSource(inParamMap);
 
 		Map<String, Object> simpleJdbcCallResult = simpleJdbcCall.execute(in);
-		System.out.println("Show Client BOL: "+simpleJdbcCallResult.get("return"));
+		log.info("Show Client BOL: "+simpleJdbcCallResult.get("return"));
 		String clientBOL = (String) simpleJdbcCallResult.get("return");
 
 		return clientBOL;

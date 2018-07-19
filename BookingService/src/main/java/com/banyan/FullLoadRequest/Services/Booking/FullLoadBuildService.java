@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,9 @@ import com.banyan.FullLoadRequest.models.Booking.UserDefined;
 @Service
 public class FullLoadBuildService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(FullLoadBuildService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	// Components
 	@Autowired
 	ShipperAccessorials shipperAccessorials;
@@ -115,8 +119,7 @@ public class FullLoadBuildService {
 		RateQtAddress rtQtAdd = new RateQtAddress();
 		addresses = addressRep.FindAllByRtQteId(qte.getId());
 		if (addresses.isEmpty()) {
-			System.out.println("Rate Quote Address does not exist for the given information.");
-			Logger.error("Rate Quote Address does not exist for "+id);
+			nxtLogger.error("Rate Quote Address does not exist for "+id);
 			return null;
 		}
 		rtQtAdd = addresses.get(0);
@@ -125,8 +128,7 @@ public class FullLoadBuildService {
 		RateQtDetail detail = new RateQtDetail();
 		details = detailRep.findByRtQteAddId(rtQtAdd.getId());
 		if (details.isEmpty()) {
-			System.out.println("Rate Quote Detail does not exist for the given information.");
-			Logger.error("Rate Quote Detail does not exist for "+id);
+			nxtLogger.error("Rate Quote Detail does not exist for "+id);
 			return null;
 		}
 
@@ -159,7 +161,7 @@ public class FullLoadBuildService {
 		else if (clientCode != null)
 			clientRefNum = clientCode.toString();
 		else
-			System.out.println("ClientRefNum cannot be assigned for ..... " + clientCode + "  " + locNumber);
+			log.info("ClientRefNum cannot be assigned for ..... " + clientCode + "  " + locNumber);
 		
 		authData.setClientRefNum(clientRefNum);
 		PackageInfo packageInfo = new PackageInfo(null, null);

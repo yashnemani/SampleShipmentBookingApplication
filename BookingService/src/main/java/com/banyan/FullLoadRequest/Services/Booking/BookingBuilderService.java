@@ -2,6 +2,7 @@ package com.banyan.FullLoadRequest.Services.Booking;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -10,7 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +25,14 @@ import com.banyan.FullLoadRequest.Repos.BookingReferencesRepository;
 import com.banyan.FullLoadRequest.Repos.BookingRepository;
 import com.banyan.FullLoadRequest.Repos.RateQtAddressRepository;
 import com.banyan.FullLoadRequest.Repos.RateQtRepository;
-import com.banyan.FullLoadRequest.config.HackedObjectInputStream;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.Loadinfo;
 
 @Service
 public class BookingBuilderService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(BookingBuilderService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
 	@Autowired
 	FullLoad_Request fullLoad;
 	@Autowired
@@ -59,7 +62,7 @@ public class BookingBuilderService {
 		boolean bool = bookRepo.existsById(id);
 		// Update Booking if it already exists
 		if (bool == true) {
-			System.out.println("The Booking with this id " + id + " already exists in the DB");
+			log.info("The Booking with this id " + id + " already exists in the DB");
 			Optional<Booking> book1 = bookRepo.findById(id);
 			book = book1.get();
 			book.setUpdate(true);
@@ -73,15 +76,13 @@ public class BookingBuilderService {
 		try {
 			book.setFullLoad(fullLoad1);
 		} catch (SQLException | IOException e) {
-			e.printStackTrace();
-			Logger.error(e.getMessage());
+			nxtLogger.error(e.getMessage());
 		}
 
 		// Save Booking Carrier Code
 		String scac = getCarrierCode(id);
 		if (scac == null) {
-			System.out.println("Rate Quote with ID " + id + " does not have a Carrier Code!");
-			Logger.warn("Rate Quote with ID " + id + " does not have a Carrier Code!");
+			nxtLogger.error("Rate Quote with ID " + id + " does not have a Carrier Code!");
 			return book;
 		}
 		book.setCARRIER_CODE(scac);
@@ -127,15 +128,13 @@ public class BookingBuilderService {
 			book.setStatuses(statuses);
 			book.setCurrentStatus(currentStatus);
 		} else
-			System.out.println("Booking already has a current status? " + book.getCurrentStatus().getShipStatus());
+			log.info("Booking already has a current status? " + book.getCurrentStatus().getShipStatus());
 
 		try {
 			bookRepo.save(book);
 			bookRepo.refresh(book);
 		} catch (RuntimeException ex) {
-			System.err.println("Save Book " + ex.getCause().getMessage());
-			System.err.println(ex);
-			Logger.error(ex.getMessage()+" "+id);
+			nxtLogger.error(ex.getMessage()+" "+id);
 			return null;
 		}
 
@@ -144,9 +143,7 @@ public class BookingBuilderService {
 				if (book.getPROVIDER_ID() != 0)
 					bookRepo.saveToTrackingQueue(id, book.getPROVIDER_ID());
 			} catch (RuntimeException ex) {
-				System.err.println("Save Book " + ex.getCause().getMessage());
-				System.err.println(ex);
-				Logger.error(ex.getMessage()+" "+id);
+				nxtLogger.error(ex.getMessage()+" "+id);
 			}
 		}
 		return book;
@@ -200,9 +197,8 @@ public class BookingBuilderService {
 			bookRefs.add(bookRef1);
 		}
 
-		System.out.println();
-		System.out.print("Reference Types: ");
-		bookRefs.forEach(a -> System.out.print(" " + a.getRef_type() + ","));
+		log.info("Reference Types: ");
+		bookRefs.forEach(a -> log.info(" " + a.getRef_type() + ","));
 		return bookRefs;
 	}
 
@@ -211,7 +207,7 @@ public class BookingBuilderService {
 
 		Optional<Booking> book1 = bookRepo.findById(id);
 		if (book1.isPresent()) {
-			System.out.println(id + " Present");
+			log.info(id + " Present");
 			Booking books = book1.get();
 			return books;
 		}
@@ -223,15 +219,14 @@ public class BookingBuilderService {
 		FullLoad_Request fullLoad1 = new FullLoad_Request();
 		fullLoad1 = null;
 		if (books.getFullLoad() == null)
-			System.out.println("The fullload BLOB for the given booking is null");
+			log.warn("The fullload BLOB for the given booking is null");
 		else
 			try {
 				ByteArrayInputStream in = new ByteArrayInputStream(books.getFullLoad());
-				HackedObjectInputStream his = new HackedObjectInputStream(in);
+				ObjectInputStream his = new ObjectInputStream(in);
 				fullLoad1 = (FullLoad_Request) his.readObject();
 			} catch (ClassNotFoundException | IOException e) {
-				System.err.println("Deserialize FullLoad " + e.getCause().getMessage());
-				Logger.error("FullLoad Blob Error " + e.getMessage());
+				nxtLogger.error("FullLoad Blob Error " + e.getMessage());
 			}
 		return fullLoad1;
 	}

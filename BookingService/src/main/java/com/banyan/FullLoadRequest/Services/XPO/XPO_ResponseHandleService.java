@@ -7,7 +7,8 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.pmw.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,9 @@ import com.google.gson.Gson;
 @Service
 public class XPO_ResponseHandleService {
 
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(XPO_ResponseHandleService.class);
+	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	BookingRepository bookRepo;
 	@Autowired
@@ -40,8 +44,7 @@ public class XPO_ResponseHandleService {
 			jobj = new JSONObject(json);
 			pkupCnfmNmbr = jobj.getJSONObject("data").get("confirmationNbr").toString();
 		} catch (JSONException e) {
-			System.out.println(e);
-			Logger.error("JSON Exception " + e.getMessage());
+			nxtLogger.error("JSON Exception " + e.getMessage());
 			return;
 		}
 
@@ -67,7 +70,6 @@ public class XPO_ResponseHandleService {
 
 		BookingCurrentStatus currentStatus = new BookingCurrentStatus();
 		if (book.getCurrentStatus() != null) {
-			System.out.println("Update Current Status");
 			currentStatus = book.getCurrentStatus();
 		}
 		currentStatus.setBooking(book);
@@ -87,8 +89,7 @@ public class XPO_ResponseHandleService {
 		try {
 			bookRepo.save(book);
 		} catch (RuntimeException ex) {
-			System.err.println(ex.getMessage());
-			Logger.error("RunTime Exception " + ex.getMessage());
+			nxtLogger.error("RunTime Exception " + ex.getMessage());
 		}
 	}
 }
