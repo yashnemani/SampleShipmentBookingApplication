@@ -22,7 +22,7 @@ public class UpdateLoadService {
 	BookingBuilderService bookingService;
 
 	@Transactional
-	public FullLoad_Request updateLoad(int bookingId, Integer type) {
+	public FullLoad_Request updateLoad(int bookingId) {
 
 		System.out.println("Booking ID: " + bookingId);
 
@@ -50,7 +50,7 @@ public class UpdateLoadService {
 				.setCustomerPO(loadinfo.getCustomerPO()).setIncoTermID(loadinfo.getIncoTermID())
 				.setInvoiceID(loadinfo.getInvoiceID()).setLoadID(Integer.parseInt(loadID)).setManifestID(pro).build();
 
-		fullLoad = new FullLoad_Request.Builder().setAuthenticationData(new AuthenticationData(type))
+		fullLoad = new FullLoad_Request.Builder().setAuthenticationData(new AuthenticationData())
 				.setLoadinfo(loadinfo).setBillTo(fullLoad.getBillTo()).setRateServices(fullLoad.getRateServices())
 				.setProducts(fullLoad.getProducts()).setShipper(fullLoad.getShipper())
 				.setConsignee(fullLoad.getConsignee()).setPackageInfo(fullLoad.getPackageInfo())

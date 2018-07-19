@@ -12,17 +12,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.banyan.FullLoadRequest.Entities.Booking;
+import com.banyan.FullLoadRequest.Services.MailService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportBuildService;
 import com.banyan.FullLoadRequest.Services.Banyan.ImportResponseHandlerService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingBuilderService;
-import com.banyan.FullLoadRequest.Services.Booking.FullLoadBuildService;
 import com.banyan.FullLoadRequest.Services.Booking.BookingSchedulerService;
+import com.banyan.FullLoadRequest.Services.Booking.FullLoadBuildService;
 import com.banyan.FullLoadRequest.models.Booking.FullLoad_Request;
 import com.banyan.FullLoadRequest.models.Booking.ImportForBook_Request;
 
@@ -48,6 +48,8 @@ public class BookingController {
 	ImportResponseHandlerService importResponseHandler;
 	@Autowired
 	BookingSchedulerService bookingQueueService;
+	@Autowired
+	MailService mailService;
 
 	// Generate FullLoadRequest Object from the given RateQuoteId
 	@GetMapping("/getFullLoadRequest/{id}/{update}")
@@ -90,8 +92,9 @@ public class BookingController {
 
 		Booking book = null;
 		book = bookService.getBooking(id);
-		if (book == null)
-			return "Booking for ID " + id + " does not exist in DB! Try a valid BookingID";
+		if (book == null) {
+			mailService.sendMail("Booking for ID " + id + " does not exist in DB! Try a valid BookingID");
+			return "Booking for ID " + id + " does not exist in DB! Try a valid BookingID";}
 		fullLoad = bookService.getFullLoad(book);
 		return fullLoad;
 	}
