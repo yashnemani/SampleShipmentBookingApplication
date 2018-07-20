@@ -54,7 +54,7 @@ public class UpdateController {
 			System.out.println(e.getStatusCode());
 			System.out.println(e.getResponseBodyAsString());
 			Logger.error("Banyan Update Load Failed for ID " + id + " Error: " + e.getMessage());
-			return result.getStatusCode().toString();
+			return e.getStatusCode().toString();
 		}
 		return result.getStatusCode().toString();
 	}
