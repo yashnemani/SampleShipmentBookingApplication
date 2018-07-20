@@ -25,6 +25,7 @@ public class UpdateController {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(UpdateController.class);
 	Logger nxtLogger = LoggerFactory.getLogger("com.nexterus");
+	
 	@Autowired
 	UpdateLoadService updateLoadService;
 
