@@ -30,7 +30,6 @@ public class BookingSchedulerService {
 
 	private Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
 	int start = 0;
-	int type = 1;
 
 	@Scheduled(cron = "0 7 * * * ?")
 	public void generateBookingsFromQueue() {
@@ -61,7 +60,7 @@ public class BookingSchedulerService {
 	}
 
 	@Transactional
-	@Scheduled(cron = "0 0/30 * * * ?")
+	@Scheduled(cron = "0 33 * * * ?")
 	public void updateBanyanLoads() {
 
 		// Insert Bookings to be updated into Banyan Update Queue

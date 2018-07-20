@@ -58,7 +58,7 @@ public class UpdateController {
 			nxtLogger.error("Banyan Update Load Failed for ID " + id + " Error: " + e.getMessage());
 				return e.getStatusCode().toString();
 		}
-			return result.getStatusCode().toString();	
+		return result.getStatusCode().toString();
 	}
 
 	@GetMapping("/getUpdateLoad/{id}")
