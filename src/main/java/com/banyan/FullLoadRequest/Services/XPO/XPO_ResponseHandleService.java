@@ -44,7 +44,7 @@ public class XPO_ResponseHandleService {
 			jobj = new JSONObject(json);
 			pkupCnfmNmbr = jobj.getJSONObject("data").get("confirmationNbr").toString();
 		} catch (JSONException e) {
-			nxtLogger.error("JSON Exception " + e.getMessage());
+			log.error("JSON Exception " + e.getMessage());
 			return;
 		}
 

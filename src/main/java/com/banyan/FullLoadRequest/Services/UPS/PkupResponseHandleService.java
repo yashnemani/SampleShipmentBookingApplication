@@ -50,14 +50,14 @@ public class PkupResponseHandleService {
 							.getJSONObject("ErrorDetail").getJSONObject("PrimaryErrorCode").getString("Description");
 					log.warn("UPS Pickup Req Failed for "+id+" "+error);
 				} catch (JSONException e) {
-					nxtLogger.error("JSON Exception " + e.getMessage());
+					log.error("JSON Exception " + e.getMessage());
 				}
 				return;
 			}
 			pkupCnfmNmbr = jobj.getJSONObject("FreightPickupResponse").get("PickupRequestConfirmationNumber")
 					.toString();
 		} catch (JSONException e) {
-			nxtLogger.error("JSON Exception " + e.getMessage());
+			log.error("JSON Exception " + e.getMessage());
 			return;
 		}
 

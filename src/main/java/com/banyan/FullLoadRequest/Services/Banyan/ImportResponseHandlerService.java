@@ -57,11 +57,11 @@ public class ImportResponseHandlerService {
 					log.info("EST Delivery: " + EstimatedDeliveryDate);
 					pickupNum = json2.getString("PickupNumber");
 				} catch (JSONException e) {
-					nxtLogger.error("JSON Exception " + e.getMessage());
+					log.error("JSON Exception " + e.getMessage());
 				}
 			}
 		} catch (JSONException e) {
-			nxtLogger.error("JSON Exception " + e.getMessage());
+			log.error("JSON Exception " + e.getMessage());
 		}
 
 		if (!bookRepo.existsById(id)) {
