@@ -15,13 +15,13 @@ public class AddressInfoBuilderService {
 if(i==0) {
 		 add = new Address.Builder().setAddress1(rtQtAddress.getOriginAddress()).setAddress2(null)
 				.setCity(rtQtAddress.getOriginCity()).setCountryCode(rtQtAddress.getOriginCountryCode())
-				.setCountryName(null).setLocationName(rtQtAddress.getOriginCity())
+				.setCountryName(null).setLocationName(rtQtAddress.getOriginName())
 				.setZipcode(rtQtAddress.getOriginZipCode()).setState(rtQtAddress.getOriginStateCode()).build();
 }
 else if (i==1) {
 	 add = new Address.Builder().setAddress1(rtQtAddress.getDestAddress()).setAddress2(null)
 			.setCity(rtQtAddress.getDestCity()).setCountryCode(rtQtAddress.getDestCountryCode())
-			.setCountryName(null).setLocationName(rtQtAddress.getDestCity())
+			.setCountryName(null).setLocationName(rtQtAddress.getDestName())
 			.setZipcode(rtQtAddress.getDestZipCode()).setState(rtQtAddress.getDestStateCode()).build();
 }
 
